@@ -60,6 +60,7 @@ export interface Dictionary {
     availability: string;
     specifications: string;
     description: string;
+    bestSuitedFor: string;
     requestQuote: string;
     whatsapp: string;
     backToEquipment: string;
@@ -96,6 +97,7 @@ export interface Dictionary {
     phone: string;
     email: string;
     whatsapp: string;
+    address: string;
     ctaText: string;
   };
   footer: {
@@ -165,6 +167,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       availability: "Availability",
       specifications: "Specifications",
       description: "Description",
+      bestSuitedFor: "Best suited for",
       requestQuote: "Request a Quote",
       whatsapp: "WhatsApp",
       backToEquipment: "Back to Equipment",
@@ -201,6 +204,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       phone: "Phone",
       email: "Email",
       whatsapp: "WhatsApp",
+      address: "Address",
       ctaText: "Request a Quote",
     },
     footer: {
@@ -267,6 +271,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       availability: "التوفر",
       specifications: "المواصفات",
       description: "الوصف",
+      bestSuitedFor: "الأنسب لـ",
       requestQuote: "اطلب عرض سعر",
       whatsapp: "واتساب",
       backToEquipment: "العودة إلى المعدات",
@@ -303,6 +308,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       phone: "الهاتف",
       email: "البريد الإلكتروني",
       whatsapp: "واتساب",
+      address: "العنوان",
       ctaText: "اطلب عرض سعر",
     },
     footer: {

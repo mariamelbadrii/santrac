@@ -20,6 +20,7 @@ export interface EquipmentTypeRow {
   slug: string;
   name_en: string;
   name_ar: string;
+  enabled: boolean;
   created_at: string;
 }
 
@@ -39,6 +40,8 @@ export interface EquipmentRow {
   additional_images: string[];
   description_en: string | null;
   description_ar: string | null;
+  best_suited_for_en: string | null;
+  best_suited_for_ar: string | null;
   specifications: Record<string, string | number | boolean>;
   featured: boolean;
   published: boolean;
@@ -59,6 +62,7 @@ export interface LeadRow {
   additional_requirements: string | null;
   equipment_id: string | null;
   status: LeadStatus;
+  source: string | null;
   utm_source: string | null;
   utm_medium: string | null;
   utm_campaign: string | null;
@@ -79,10 +83,17 @@ export interface SiteSettingsRow {
   id: number;
   whatsapp_number: string | null;
   phone: string | null;
+  secondary_phone: string | null;
   email: string | null;
+  address_en: string | null;
+  address_ar: string | null;
   facebook_url: string | null;
   instagram_url: string | null;
   linkedin_url: string | null;
+  tiktok_url: string | null;
+  youtube_url: string | null;
+  hours_en: string | null;
+  hours_ar: string | null;
   updated_at: string;
 }
 

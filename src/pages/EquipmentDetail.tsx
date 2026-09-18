@@ -56,6 +56,7 @@ export default function EquipmentDetail() {
     (src): src is string => Boolean(src),
   );
   const description = locale === "ar" ? equipment.description_ar : equipment.description_en;
+  const bestSuitedFor = locale === "ar" ? equipment.best_suited_for_ar : equipment.best_suited_for_en;
 
   return (
     <Container className="py-8 sm:py-12">
@@ -169,6 +170,15 @@ export default function EquipmentDetail() {
                 {t.equipmentDetail.description}
               </h2>
               <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-600">{description}</p>
+            </div>
+          )}
+
+          {bestSuitedFor && (
+            <div className="mt-8 border-t border-ink-100 pt-6">
+              <h2 className="text-sm font-semibold uppercase tracking-widest2 text-ink-500">
+                {t.equipmentDetail.bestSuitedFor}
+              </h2>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-600">{bestSuitedFor}</p>
             </div>
           )}
         </Reveal>

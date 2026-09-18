@@ -26,6 +26,7 @@ export function useEquipmentList(): UseEquipmentListResult {
       .from("equipment")
       .select("*")
       .eq("published", true)
+      .neq("status", "archived")
       .order("featured", { ascending: false })
       .order("created_at", { ascending: false })
       .then(({ data, error: fetchError }) => {
@@ -62,6 +63,7 @@ export function useEquipmentBySlug(slug: string | undefined) {
       .select("*")
       .eq("slug", slug)
       .eq("published", true)
+      .neq("status", "archived")
       .maybeSingle()
       .then(({ data, error: fetchError }) => {
         if (cancelled) return;

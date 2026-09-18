@@ -24,6 +24,7 @@ const AdminInventoryNew = lazy(() => import("@/pages/admin/AdminInventoryNew"));
 const AdminInventoryEdit = lazy(() => import("@/pages/admin/AdminInventoryEdit"));
 const AdminLeads = lazy(() => import("@/pages/admin/AdminLeads"));
 const AdminSettings = lazy(() => import("@/pages/admin/AdminSettings"));
+const AdminCategories = lazy(() => import("@/pages/admin/AdminCategories"));
 
 export default function App() {
   return (
@@ -52,6 +53,7 @@ export default function App() {
                       <Route path="inventory" element={<AdminInventoryList />} />
                       <Route path="inventory/new" element={<AdminInventoryNew />} />
                       <Route path="inventory/:id/edit" element={<AdminInventoryEdit />} />
+                      <Route path="categories" element={<AdminCategories />} />
                       <Route path="leads" element={<AdminLeads />} />
                       <Route path="settings" element={<AdminSettings />} />
                     </Route>

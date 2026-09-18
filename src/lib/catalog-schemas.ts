@@ -32,6 +32,8 @@ export const equipmentSchema = z.object({
   additional_images: z.array(z.string().url()).default([]),
   description_en: z.string().nullable().default(null),
   description_ar: z.string().nullable().default(null),
+  best_suited_for_en: z.string().nullable().default(null),
+  best_suited_for_ar: z.string().nullable().default(null),
   specifications: z.record(z.union([z.string(), z.number(), z.boolean()])).default({}),
   featured: z.boolean().default(false),
   published: z.boolean().default(false),
@@ -39,6 +41,18 @@ export const equipmentSchema = z.object({
 });
 
 export type EquipmentInput = z.infer<typeof equipmentSchema>;
+
+export const equipmentTypeSchema = z.object({
+  slug: z
+    .string()
+    .min(1, "Slug is required")
+    .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Use lowercase letters, numbers, and hyphens"),
+  name_en: z.string().min(1, "English name is required"),
+  name_ar: z.string().min(1, "Arabic name is required"),
+  enabled: z.boolean().default(true),
+});
+
+export type EquipmentTypeInput = z.infer<typeof equipmentTypeSchema>;
 
 // Public lead / quote request form. Honeypot field ("website") is included
 // and must stay empty — a filled value marks the submission as spam.

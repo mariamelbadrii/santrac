@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Linkedin, Mail, MessageCircle, Phone } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/config";
 import { useSiteSettings } from "@/lib/settings/SiteSettingsContext";
@@ -8,15 +8,19 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 export default function Contact() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const settings = useSiteSettings();
   const waHref = whatsappLink(undefined, settings.whatsappNumber);
+  const address = locale === "ar" ? settings.addressAr : settings.addressEn;
+  const hours = locale === "ar" ? settings.hoursAr : settings.hoursEn;
 
   const channels = [
     settings.phone
       ? {
+          key: "phone",
           icon: Phone,
           label: t.contact.phone,
           value: settings.phone,
@@ -25,8 +29,20 @@ export default function Contact() {
           onClick: () => trackEvent("CallClick"),
         }
       : null,
+    settings.secondaryPhone
+      ? {
+          key: "secondary_phone",
+          icon: Phone,
+          label: t.contact.phone,
+          value: settings.secondaryPhone,
+          href: `tel:${settings.secondaryPhone}`,
+          external: false,
+          onClick: () => trackEvent("CallClick"),
+        }
+      : null,
     settings.email
       ? {
+          key: "email",
           icon: Mail,
           label: t.contact.email,
           value: settings.email,
@@ -37,6 +53,7 @@ export default function Contact() {
       : null,
     waHref
       ? {
+          key: "whatsapp",
           icon: MessageCircle,
           label: t.contact.whatsapp,
           value: settings.whatsappNumber || t.contact.whatsapp,
@@ -45,12 +62,25 @@ export default function Contact() {
           onClick: () => trackEvent("WhatsAppClick"),
         }
       : null,
+    address
+      ? {
+          key: "address",
+          icon: MapPin,
+          label: t.contact.address,
+          value: hours ? `${address}\n${hours}` : address,
+          href: null,
+          external: false,
+          onClick: undefined,
+        }
+      : null,
   ].filter((channel): channel is NonNullable<typeof channel> => channel !== null);
 
   const socialLinks = [
     settings.facebookUrl && { icon: Facebook, href: settings.facebookUrl, label: "Facebook" },
     settings.instagramUrl && { icon: Instagram, href: settings.instagramUrl, label: "Instagram" },
     settings.linkedinUrl && { icon: Linkedin, href: settings.linkedinUrl, label: "LinkedIn" },
+    settings.tiktokUrl && { icon: TikTokIcon, href: settings.tiktokUrl, label: "TikTok" },
+    settings.youtubeUrl && { icon: Youtube, href: settings.youtubeUrl, label: "YouTube" },
   ].filter((link): link is { icon: typeof Facebook; href: string; label: string } => Boolean(link));
 
   return (
@@ -66,27 +96,39 @@ export default function Contact() {
           <Stagger as="div" className="mt-9 divide-y divide-ink-100 border-y border-ink-100">
             {channels.map((channel) => {
               const Icon = channel.icon;
+              const content = (
+                <>
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink-50 text-ink-500 transition-colors group-hover:bg-brand-50 group-hover:text-brand-500">
+                    <Icon aria-hidden="true" className="h-5 w-5" />
+                  </span>
+                  <span>
+                    <span className="block text-xs font-semibold uppercase tracking-widest2 text-ink-400">
+                      {channel.label}
+                    </span>
+                    <span
+                      className="block whitespace-pre-line text-[0.9375rem] font-medium text-ink-900"
+                      dir={channel.key === "address" ? undefined : "ltr"}
+                    >
+                      {channel.value}
+                    </span>
+                  </span>
+                </>
+              );
               return (
-                <StaggerItem key={channel.label}>
-                  <a
-                    href={channel.href}
-                    target={channel.external ? "_blank" : undefined}
-                    rel={channel.external ? "noreferrer" : undefined}
-                    onClick={channel.onClick}
-                    className="group flex items-center gap-4 py-5 transition-colors hover:bg-ink-25"
-                  >
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink-50 text-ink-500 transition-colors group-hover:bg-brand-50 group-hover:text-brand-500">
-                      <Icon aria-hidden="true" className="h-5 w-5" />
-                    </span>
-                    <span>
-                      <span className="block text-xs font-semibold uppercase tracking-widest2 text-ink-400">
-                        {channel.label}
-                      </span>
-                      <span className="block text-[0.9375rem] font-medium text-ink-900" dir="ltr">
-                        {channel.value}
-                      </span>
-                    </span>
-                  </a>
+                <StaggerItem key={channel.key}>
+                  {channel.href ? (
+                    <a
+                      href={channel.href}
+                      target={channel.external ? "_blank" : undefined}
+                      rel={channel.external ? "noreferrer" : undefined}
+                      onClick={channel.onClick}
+                      className="group flex items-center gap-4 py-5 transition-colors hover:bg-ink-25"
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    <div className="group flex items-center gap-4 py-5">{content}</div>
+                  )}
                 </StaggerItem>
               );
             })}

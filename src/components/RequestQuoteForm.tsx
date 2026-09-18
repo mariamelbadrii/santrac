@@ -56,6 +56,7 @@ export function RequestQuoteForm({ equipmentId, prefillEquipmentNeed }: RequestQ
       brand_model_preference: values.brand_model_preference || null,
       additional_requirements: values.additional_requirements || null,
       equipment_id: values.equipment_id ?? null,
+      source: typeof window !== "undefined" ? window.location.pathname : null,
       utm_source: utm.utm_source,
       utm_medium: utm.utm_medium,
       utm_campaign: utm.utm_campaign,

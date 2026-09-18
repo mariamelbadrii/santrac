@@ -14,12 +14,19 @@ export const config = {
   contact: {
     whatsappNumber: import.meta.env.VITE_WHATSAPP_NUMBER ?? "",
     phone: import.meta.env.VITE_CONTACT_PHONE ?? "",
+    secondaryPhone: import.meta.env.VITE_CONTACT_SECONDARY_PHONE ?? "",
     email: import.meta.env.VITE_CONTACT_EMAIL ?? "",
+    addressEn: import.meta.env.VITE_ADDRESS_EN ?? "",
+    addressAr: import.meta.env.VITE_ADDRESS_AR ?? "",
+    hoursEn: import.meta.env.VITE_HOURS_EN ?? "",
+    hoursAr: import.meta.env.VITE_HOURS_AR ?? "",
   },
   social: {
     facebookUrl: import.meta.env.VITE_FACEBOOK_URL ?? "",
     instagramUrl: import.meta.env.VITE_INSTAGRAM_URL ?? "",
     linkedinUrl: import.meta.env.VITE_LINKEDIN_URL ?? "",
+    tiktokUrl: import.meta.env.VITE_TIKTOK_URL ?? "",
+    youtubeUrl: import.meta.env.VITE_YOUTUBE_URL ?? "",
   },
   analytics: {
     ga4MeasurementId: import.meta.env.VITE_GA4_MEASUREMENT_ID ?? "",

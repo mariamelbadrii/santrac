@@ -1,21 +1,26 @@
 import { NavLink } from "react-router-dom";
-import { Facebook, Instagram, Linkedin, Mail, MessageCircle, Phone } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/config";
 import { useSiteSettings } from "@/lib/settings/SiteSettingsContext";
 import { Container } from "@/components/ui/Container";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { trackEvent } from "@/lib/analytics";
 
 export function Footer() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const settings = useSiteSettings();
   const year = new Date().getFullYear();
   const waHref = whatsappLink(undefined, settings.whatsappNumber);
+  const address = locale === "ar" ? settings.addressAr : settings.addressEn;
+  const hours = locale === "ar" ? settings.hoursAr : settings.hoursEn;
 
   const socialLinks = [
     settings.facebookUrl && { icon: Facebook, href: settings.facebookUrl, label: "Facebook" },
     settings.instagramUrl && { icon: Instagram, href: settings.instagramUrl, label: "Instagram" },
     settings.linkedinUrl && { icon: Linkedin, href: settings.linkedinUrl, label: "LinkedIn" },
+    settings.tiktokUrl && { icon: TikTokIcon, href: settings.tiktokUrl, label: "TikTok" },
+    settings.youtubeUrl && { icon: Youtube, href: settings.youtubeUrl, label: "YouTube" },
   ].filter((link): link is { icon: typeof Facebook; href: string; label: string } => Boolean(link));
 
   return (
@@ -88,6 +93,13 @@ export function Footer() {
                 {t.contact.whatsapp}
               </a>
             )}
+            {address && (
+              <p className="flex items-start gap-2.5 text-ink-300">
+                <MapPin aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-ink-500" />
+                {address}
+              </p>
+            )}
+            {hours && <p className="ps-6 text-xs text-ink-400">{hours}</p>}
           </div>
 
           {socialLinks.length > 0 && (

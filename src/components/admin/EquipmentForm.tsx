@@ -1,12 +1,16 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus, X } from "lucide-react";
 import { equipmentSchema, type EquipmentInput } from "@/lib/catalog-schemas";
 import type { EquipmentRow } from "@/lib/database.types";
+import { useEquipmentTypes } from "@/hooks/useEquipmentTypes";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
+import { SingleImageUploader, GalleryUploader } from "@/components/admin/ImageUploader";
 
 interface EquipmentFormProps {
   initialValues?: EquipmentRow;
@@ -14,7 +18,26 @@ interface EquipmentFormProps {
   submitLabel: string;
 }
 
+interface SpecRow {
+  key: string;
+  value: string;
+}
+
+function specsToRows(specs: EquipmentRow["specifications"] | undefined): SpecRow[] {
+  if (!specs) return [];
+  return Object.entries(specs).map(([key, value]) => ({ key, value: String(value) }));
+}
+
+function rowsToSpecs(rows: SpecRow[]): Record<string, string> {
+  return Object.fromEntries(rows.filter((row) => row.key.trim()).map((row) => [row.key.trim(), row.value]));
+}
+
 export function EquipmentForm({ initialValues, onSubmit, submitLabel }: EquipmentFormProps) {
+  const { types: categories } = useEquipmentTypes();
+  const [mainImage, setMainImage] = useState<string | null>(initialValues?.main_image ?? null);
+  const [gallery, setGallery] = useState<string[]>(initialValues?.additional_images ?? []);
+  const [specRows, setSpecRows] = useState<SpecRow[]>(specsToRows(initialValues?.specifications));
+
   const {
     register,
     handleSubmit,
@@ -33,18 +56,15 @@ export function EquipmentForm({ initialValues, onSubmit, submitLabel }: Equipmen
           availability: initialValues.availability,
           price_mode: initialValues.price_mode,
           price: initialValues.price,
-          main_image: initialValues.main_image,
-          additional_images: initialValues.additional_images,
           description_en: initialValues.description_en,
           description_ar: initialValues.description_ar,
-          specifications: initialValues.specifications,
+          best_suited_for_en: initialValues.best_suited_for_en,
+          best_suited_for_ar: initialValues.best_suited_for_ar,
           featured: initialValues.featured,
           published: initialValues.published,
           status: initialValues.status,
         }
       : {
-          additional_images: [],
-          specifications: {},
           featured: false,
           published: false,
           status: "draft",
@@ -54,13 +74,38 @@ export function EquipmentForm({ initialValues, onSubmit, submitLabel }: Equipmen
         },
   });
 
+  const submit = handleSubmit((data) =>
+    onSubmit({
+      ...data,
+      main_image: mainImage,
+      additional_images: gallery,
+      specifications: rowsToSpecs(specRows),
+    }),
+  );
+
+  const addSpecRow = () => setSpecRows((prev) => [...prev, { key: "", value: "" }]);
+  const updateSpecRow = (index: number, patch: Partial<SpecRow>) =>
+    setSpecRows((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  const removeSpecRow = (index: number) => setSpecRows((prev) => prev.filter((_, i) => i !== index));
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid max-w-3xl gap-4 sm:grid-cols-2">
-      <Field label="Slug" htmlFor="slug" required error={errors.slug?.message}>
+    <form onSubmit={submit} className="grid max-w-3xl gap-4 sm:grid-cols-2">
+      <Field label="Slug" htmlFor="slug" required hint="Used in the public URL" error={errors.slug?.message}>
         <Input id="slug" {...register("slug")} />
       </Field>
       <Field label="Category" htmlFor="category" required error={errors.category?.message}>
-        <Input id="category" {...register("category")} />
+        {categories.length > 0 ? (
+          <Select id="category" {...register("category")}>
+            <option value="">Select a category</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.name_en}>
+                {c.name_en}
+              </option>
+            ))}
+          </Select>
+        ) : (
+          <Input id="category" {...register("category")} placeholder="e.g. Forklift" />
+        )}
       </Field>
       <Field label="Brand" htmlFor="brand" required error={errors.brand?.message}>
         <Input id="brand" {...register("brand")} />
@@ -97,17 +142,13 @@ export function EquipmentForm({ initialValues, onSubmit, submitLabel }: Equipmen
       <Field label="Price" htmlFor="price">
         <Input id="price" type="number" {...register("price", { valueAsNumber: true })} />
       </Field>
-      <Field label="Main image URL" htmlFor="main_image" error={errors.main_image?.message}>
-        <Input id="main_image" {...register("main_image")} />
-      </Field>
-      <Field label="Status" htmlFor="status" required>
-        <Select id="status" {...register("status")}>
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-          <option value="sold">Sold</option>
-          <option value="archived">Archived</option>
-        </Select>
-      </Field>
+
+      <div className="sm:col-span-2">
+        <SingleImageUploader label="Main image" value={mainImage} onChange={setMainImage} />
+      </div>
+      <div className="sm:col-span-2">
+        <GalleryUploader label="Additional photos" value={gallery} onChange={setGallery} />
+      </div>
 
       <div className="sm:col-span-2">
         <Field label="Description (English)" htmlFor="description_en">
@@ -120,14 +161,76 @@ export function EquipmentForm({ initialValues, onSubmit, submitLabel }: Equipmen
         </Field>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-ink-700">
-        <input type="checkbox" {...register("featured")} />
-        Featured
-      </label>
-      <label className="flex items-center gap-2 text-sm text-ink-700">
-        <input type="checkbox" {...register("published")} />
-        Published
-      </label>
+      <div className="sm:col-span-2">
+        <Field label="Best suited for (English)" htmlFor="best_suited_for_en" hint="Optional — e.g. warehouse indoor use">
+          <Textarea id="best_suited_for_en" rows={2} {...register("best_suited_for_en")} />
+        </Field>
+      </div>
+      <div className="sm:col-span-2">
+        <Field label="Best suited for (Arabic)" htmlFor="best_suited_for_ar">
+          <Textarea id="best_suited_for_ar" rows={2} dir="rtl" {...register("best_suited_for_ar")} />
+        </Field>
+      </div>
+
+      <div className="sm:col-span-2">
+        <label className="mb-1.5 block text-sm font-medium text-ink-800">Specifications</label>
+        <p className="mb-2 text-xs text-ink-500">
+          Flexible per equipment type — e.g. capacity/mast for a forklift, kVA/fuel for a
+          generator, bucket capacity/operating weight for a loader.
+        </p>
+        <div className="flex flex-col gap-2">
+          {specRows.map((row, i) => (
+            <div key={i} className="flex gap-2">
+              <Input
+                placeholder="Spec name (e.g. Capacity)"
+                value={row.key}
+                onChange={(e) => updateSpecRow(i, { key: e.target.value })}
+              />
+              <Input
+                placeholder="Value (e.g. 3 tons)"
+                value={row.value}
+                onChange={(e) => updateSpecRow(i, { value: e.target.value })}
+              />
+              <button
+                type="button"
+                onClick={() => removeSpecRow(i)}
+                aria-label="Remove specification"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded border border-ink-200 text-ink-500 hover:border-brand-500 hover:text-brand-600"
+              >
+                <X aria-hidden="true" className="h-4 w-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addSpecRow}
+          className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700"
+        >
+          <Plus aria-hidden="true" className="h-4 w-4" />
+          Add specification
+        </button>
+      </div>
+
+      <Field label="Status" htmlFor="status" required>
+        <Select id="status" {...register("status")}>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+          <option value="sold">Sold</option>
+          <option value="archived">Archived</option>
+        </Select>
+      </Field>
+
+      <div className="flex items-center gap-4">
+        <label className="flex items-center gap-2 text-sm text-ink-700">
+          <input type="checkbox" {...register("featured")} />
+          Featured
+        </label>
+        <label className="flex items-center gap-2 text-sm text-ink-700">
+          <input type="checkbox" {...register("published")} />
+          Published
+        </label>
+      </div>
 
       <div className="sm:col-span-2">
         <Button type="submit" disabled={isSubmitting}>

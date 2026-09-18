@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Package, MessageSquare, Settings } from "lucide-react";
+import { Package, MessageSquare, Settings, Tag } from "lucide-react";
+import { useNewLeadsCount } from "@/hooks/useNewLeadsCount";
 
 const links = [
   {
@@ -7,6 +8,12 @@ const links = [
     icon: Package,
     label: "Inventory",
     body: "Add, edit, publish, and manage equipment listings.",
+  },
+  {
+    to: "/admin/categories",
+    icon: Tag,
+    label: "Categories",
+    body: "Manage the equipment categories used across the site.",
   },
   {
     to: "/admin/leads",
@@ -18,17 +25,31 @@ const links = [
     to: "/admin/settings",
     icon: Settings,
     label: "Settings",
-    body: "Update the phone, WhatsApp, email, and social links shown on the site.",
+    body: "Update the phone, WhatsApp, email, address, and social links shown on the site.",
   },
 ];
 
 export default function AdminDashboard() {
+  const newLeadsCount = useNewLeadsCount();
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-ink-900">Dashboard</h1>
       <p className="mt-1 text-sm text-ink-500">SANTRAC admin.</p>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      {Boolean(newLeadsCount) && (
+        <Link
+          to="/admin/leads"
+          className="mt-4 flex items-center gap-3 rounded-lg border border-brand-200 bg-brand-50 p-4 text-sm font-semibold text-brand-700"
+        >
+          <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-brand-500 px-2 text-white">
+            {newLeadsCount}
+          </span>
+          {newLeadsCount === 1 ? "New lead waiting" : "New leads waiting"} — review now →
+        </Link>
+      )}
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {links.map((link) => {
           const Icon = link.icon;
           return (
