@@ -103,6 +103,10 @@ export interface Dictionary {
   footer: {
     rights: string;
   };
+  enums: {
+    condition: { new: string; used: string; refurbished: string };
+    availability: { in_stock: string; incoming: string; sold: string };
+  };
 }
 
 export const dictionaries: Record<Locale, Dictionary> = {
@@ -210,6 +214,10 @@ export const dictionaries: Record<Locale, Dictionary> = {
     footer: {
       rights: "All rights reserved.",
     },
+    enums: {
+      condition: { new: "New", used: "Used", refurbished: "Refurbished" },
+      availability: { in_stock: "In stock", incoming: "Incoming", sold: "Sold" },
+    },
   },
   ar: {
     nav: {
@@ -271,7 +279,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       availability: "التوفر",
       specifications: "المواصفات",
       description: "الوصف",
-      bestSuitedFor: "الأنسب لـ",
+      bestSuitedFor: "مناسب لـ",
       requestQuote: "اطلب عرض سعر",
       whatsapp: "واتساب",
       backToEquipment: "العودة إلى المعدات",
@@ -313,6 +321,10 @@ export const dictionaries: Record<Locale, Dictionary> = {
     },
     footer: {
       rights: "جميع الحقوق محفوظة.",
+    },
+    enums: {
+      condition: { new: "جديد", used: "مستعمل", refurbished: "مجدد" },
+      availability: { in_stock: "متوفر", incoming: "قادم", sold: "تم البيع" },
     },
   },
 };

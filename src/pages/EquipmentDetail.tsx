@@ -4,18 +4,34 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 import { useEquipmentBySlug } from "@/hooks/useEquipmentList";
-import { displayOrDash, equipmentTitle, formatPrice } from "@/lib/display";
+import { useEquipmentTypes } from "@/hooks/useEquipmentTypes";
+import {
+  displayOrDash,
+  equipmentTitle,
+  formatPrice,
+  localizeCategory,
+  localizeLocation,
+} from "@/lib/display";
 import { WhatsAppCta } from "@/components/site/WhatsAppCta";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
+import { Bdi } from "@/components/ui/Bdi";
 import { Reveal } from "@/components/motion/Reveal";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+
+// `uppercase` + letterspacing is a Latin-typography convention — Arabic
+// script has no case and the extra tracking breaks letterform joins, so
+// these eyebrow/section labels drop it in RTL instead of mirroring the
+// English styling as-is.
+const sectionLabelClass = (dir: "ltr" | "rtl", className: string) =>
+  cn(className, dir === "ltr" ? "uppercase tracking-widest2" : "tracking-normal");
 
 export default function EquipmentDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { t, locale, dir } = useI18n();
   const { equipment, loading } = useEquipmentBySlug(slug);
+  const { types: categoryTypes } = useEquipmentTypes();
   const [activeImage, setActiveImage] = useState(0);
   const BackIcon = dir === "rtl" ? ArrowRight : ArrowLeft;
 
@@ -57,6 +73,8 @@ export default function EquipmentDetail() {
   );
   const description = locale === "ar" ? equipment.description_ar : equipment.description_en;
   const bestSuitedFor = locale === "ar" ? equipment.best_suited_for_ar : equipment.best_suited_for_en;
+  const category = localizeCategory(equipment.category, categoryTypes, locale);
+  const location = localizeLocation(equipment.location, locale);
 
   return (
     <Container className="py-8 sm:py-12">
@@ -111,16 +129,22 @@ export default function EquipmentDetail() {
         </Reveal>
 
         <Reveal delay={0.1}>
-          <span className="text-xs font-semibold uppercase tracking-widest2 text-brand-500">
-            {equipment.category}
+          <span className={sectionLabelClass(dir, "text-xs font-semibold text-brand-500")}>
+            {category}
           </span>
-          <h1 className="mt-2 text-display-sm font-bold text-ink-900">{equipmentTitle(equipment)}</h1>
+          <h1 className="mt-2 text-display-sm font-bold text-ink-900">
+            <Bdi dir="ltr">{equipmentTitle(equipment)}</Bdi>
+          </h1>
 
           <div className="mt-3 flex flex-wrap items-center gap-1.5">
-            <Badge tone="neutral">{equipment.condition}</Badge>
-            {equipment.year && <Badge tone="neutral">{equipment.year}</Badge>}
+            <Badge tone="neutral">{t.enums.condition[equipment.condition]}</Badge>
+            {equipment.year && (
+              <Badge tone="neutral">
+                <Bdi dir="ltr">{equipment.year}</Bdi>
+              </Badge>
+            )}
             <Badge tone={equipment.availability === "sold" ? "warning" : "success"}>
-              {equipment.availability.replace("_", " ")}
+              {t.enums.availability[equipment.availability]}
             </Badge>
           </div>
 
@@ -140,24 +164,28 @@ export default function EquipmentDetail() {
           <dl className="mt-9 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-ink-100 pt-6 text-sm sm:grid-cols-3">
             <div>
               <dt className="text-ink-400">{t.equipmentDetail.year}</dt>
-              <dd className="mt-0.5 font-medium text-ink-900">{displayOrDash(equipment.year)}</dd>
+              <dd className="mt-0.5 font-medium text-ink-900">
+                {equipment.year ? <Bdi dir="ltr">{equipment.year}</Bdi> : displayOrDash(null)}
+              </dd>
             </div>
             <div>
               <dt className="text-ink-400">{t.equipmentDetail.location}</dt>
-              <dd className="mt-0.5 font-medium text-ink-900">{displayOrDash(equipment.location)}</dd>
+              <dd className="mt-0.5 font-medium text-ink-900">{displayOrDash(location)}</dd>
             </div>
           </dl>
 
           {specEntries.length > 0 && (
             <div className="mt-8 border-t border-ink-100 pt-6">
-              <h2 className="text-sm font-semibold uppercase tracking-widest2 text-ink-500">
+              <h2 className={sectionLabelClass(dir, "text-sm font-semibold text-ink-500")}>
                 {t.equipmentDetail.specifications}
               </h2>
               <dl className="mt-4 divide-y divide-ink-100">
                 {specEntries.map(([key, value]) => (
-                  <div key={key} className="flex items-center justify-between py-2.5 text-sm">
+                  <div key={key} className="flex items-center justify-between gap-4 py-2.5 text-sm">
                     <dt className="text-ink-500">{key}</dt>
-                    <dd className="font-medium text-ink-900">{String(value)}</dd>
+                    <dd className="font-medium text-ink-900">
+                      <Bdi>{String(value)}</Bdi>
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -166,7 +194,7 @@ export default function EquipmentDetail() {
 
           {description && (
             <div className="mt-8 border-t border-ink-100 pt-6">
-              <h2 className="text-sm font-semibold uppercase tracking-widest2 text-ink-500">
+              <h2 className={sectionLabelClass(dir, "text-sm font-semibold text-ink-500")}>
                 {t.equipmentDetail.description}
               </h2>
               <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-600">{description}</p>
@@ -175,7 +203,7 @@ export default function EquipmentDetail() {
 
           {bestSuitedFor && (
             <div className="mt-8 border-t border-ink-100 pt-6">
-              <h2 className="text-sm font-semibold uppercase tracking-widest2 text-ink-500">
+              <h2 className={sectionLabelClass(dir, "text-sm font-semibold text-ink-500")}>
                 {t.equipmentDetail.bestSuitedFor}
               </h2>
               <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-600">{bestSuitedFor}</p>

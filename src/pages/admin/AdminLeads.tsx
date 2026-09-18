@@ -90,7 +90,7 @@ export default function AdminLeads() {
                       <a
                         href={waHref}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="inline-flex h-9 items-center gap-1.5 rounded border border-ink-200 px-3 text-xs font-semibold text-ink-700 hover:border-emerald-500 hover:text-emerald-600"
                       >
                         <MessageCircle aria-hidden="true" className="h-3.5 w-3.5" />

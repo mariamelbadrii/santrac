@@ -1,5 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
+import { normalizeExternalUrl } from "@/lib/url";
 import {
   toRawSiteSettings,
   useAdminSiteSettingsRaw,
@@ -41,13 +42,27 @@ export default function AdminSettings() {
     setStatus("saving");
     setErrorMessage(null);
 
+    // Social URLs are normalized before saving, so pasting a bare
+    // "facebook.com/santrac" always ends up stored as an absolute
+    // "https://facebook.com/santrac" — never a value that would resolve as
+    // a path relative to whatever page a visitor clicks the link from.
+    const payload = {
+      id: 1,
+      ...form,
+      facebook_url: normalizeExternalUrl(form.facebook_url) ?? "",
+      instagram_url: normalizeExternalUrl(form.instagram_url) ?? "",
+      linkedin_url: normalizeExternalUrl(form.linkedin_url) ?? "",
+      tiktok_url: normalizeExternalUrl(form.tiktok_url) ?? "",
+      youtube_url: normalizeExternalUrl(form.youtube_url) ?? "",
+    };
+
     // Upsert (not a plain update) so the singleton row is written correctly
     // even if it were ever missing, and .select().single() hands back what
     // was actually persisted so the form re-syncs to the real saved state
     // instead of trusting the values we optimistically typed in.
     const { data, error } = await supabase
       .from("site_settings")
-      .upsert({ id: 1, ...form }, { onConflict: "id" })
+      .upsert(payload, { onConflict: "id" })
       .select()
       .single();
 

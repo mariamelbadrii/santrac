@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Facebook, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/config";
+import { normalizeExternalUrl } from "@/lib/url";
 import { useSiteSettings } from "@/lib/settings/SiteSettingsContext";
 import { Container } from "@/components/ui/Container";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
@@ -16,12 +17,12 @@ export function Footer() {
   const hours = locale === "ar" ? settings.hoursAr : settings.hoursEn;
 
   const socialLinks = [
-    settings.facebookUrl && { icon: Facebook, href: settings.facebookUrl, label: "Facebook" },
-    settings.instagramUrl && { icon: Instagram, href: settings.instagramUrl, label: "Instagram" },
-    settings.linkedinUrl && { icon: Linkedin, href: settings.linkedinUrl, label: "LinkedIn" },
-    settings.tiktokUrl && { icon: TikTokIcon, href: settings.tiktokUrl, label: "TikTok" },
-    settings.youtubeUrl && { icon: Youtube, href: settings.youtubeUrl, label: "YouTube" },
-  ].filter((link): link is { icon: typeof Facebook; href: string; label: string } => Boolean(link));
+    { icon: Facebook, href: normalizeExternalUrl(settings.facebookUrl), label: "Facebook" },
+    { icon: Instagram, href: normalizeExternalUrl(settings.instagramUrl), label: "Instagram" },
+    { icon: Linkedin, href: normalizeExternalUrl(settings.linkedinUrl), label: "LinkedIn" },
+    { icon: TikTokIcon, href: normalizeExternalUrl(settings.tiktokUrl), label: "TikTok" },
+    { icon: Youtube, href: normalizeExternalUrl(settings.youtubeUrl), label: "YouTube" },
+  ].filter((link): link is { icon: typeof Facebook; href: string; label: string } => Boolean(link.href));
 
   return (
     <footer className="bg-ink-900 text-ink-200">
@@ -85,7 +86,7 @@ export function Footer() {
               <a
                 href={waHref}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 onClick={() => trackEvent("WhatsAppClick")}
                 className="flex items-center gap-2.5 text-ink-300 transition-colors hover:text-white"
               >
@@ -109,7 +110,7 @@ export function Footer() {
                   key={social.label}
                   href={social.href}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   aria-label={social.label}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-ink-300 transition-colors hover:border-white/30 hover:text-white"
                 >

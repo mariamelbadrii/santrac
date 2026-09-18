@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Facebook, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { whatsappLink } from "@/lib/config";
+import { normalizeExternalUrl } from "@/lib/url";
 import { useSiteSettings } from "@/lib/settings/SiteSettingsContext";
 import { trackEvent } from "@/lib/analytics";
 import { Container } from "@/components/ui/Container";
@@ -9,9 +10,10 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { cn } from "@/lib/utils";
 
 export default function Contact() {
-  const { t, locale } = useI18n();
+  const { t, locale, dir } = useI18n();
   const settings = useSiteSettings();
   const waHref = whatsappLink(undefined, settings.whatsappNumber);
   const address = locale === "ar" ? settings.addressAr : settings.addressEn;
@@ -76,12 +78,12 @@ export default function Contact() {
   ].filter((channel): channel is NonNullable<typeof channel> => channel !== null);
 
   const socialLinks = [
-    settings.facebookUrl && { icon: Facebook, href: settings.facebookUrl, label: "Facebook" },
-    settings.instagramUrl && { icon: Instagram, href: settings.instagramUrl, label: "Instagram" },
-    settings.linkedinUrl && { icon: Linkedin, href: settings.linkedinUrl, label: "LinkedIn" },
-    settings.tiktokUrl && { icon: TikTokIcon, href: settings.tiktokUrl, label: "TikTok" },
-    settings.youtubeUrl && { icon: Youtube, href: settings.youtubeUrl, label: "YouTube" },
-  ].filter((link): link is { icon: typeof Facebook; href: string; label: string } => Boolean(link));
+    { icon: Facebook, href: normalizeExternalUrl(settings.facebookUrl), label: "Facebook" },
+    { icon: Instagram, href: normalizeExternalUrl(settings.instagramUrl), label: "Instagram" },
+    { icon: Linkedin, href: normalizeExternalUrl(settings.linkedinUrl), label: "LinkedIn" },
+    { icon: TikTokIcon, href: normalizeExternalUrl(settings.tiktokUrl), label: "TikTok" },
+    { icon: Youtube, href: normalizeExternalUrl(settings.youtubeUrl), label: "YouTube" },
+  ].filter((link): link is { icon: typeof Facebook; href: string; label: string } => Boolean(link.href));
 
   return (
     <div className="border-t border-ink-100">
@@ -102,7 +104,12 @@ export default function Contact() {
                     <Icon aria-hidden="true" className="h-5 w-5" />
                   </span>
                   <span>
-                    <span className="block text-xs font-semibold uppercase tracking-widest2 text-ink-400">
+                    <span
+                      className={cn(
+                        "block text-xs font-semibold text-ink-400",
+                        dir === "ltr" ? "uppercase tracking-widest2" : "tracking-normal",
+                      )}
+                    >
                       {channel.label}
                     </span>
                     <span
@@ -120,7 +127,7 @@ export default function Contact() {
                     <a
                       href={channel.href}
                       target={channel.external ? "_blank" : undefined}
-                      rel={channel.external ? "noreferrer" : undefined}
+                      rel={channel.external ? "noopener noreferrer" : undefined}
                       onClick={channel.onClick}
                       className="group flex items-center gap-4 py-5 transition-colors hover:bg-ink-25"
                     >
@@ -158,7 +165,7 @@ export default function Contact() {
                     key={social.label}
                     href={social.href}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     aria-label={social.label}
                     className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-ink-300 transition-colors hover:border-white/30 hover:text-white"
                   >

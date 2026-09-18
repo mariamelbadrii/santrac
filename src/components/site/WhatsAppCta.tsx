@@ -15,7 +15,7 @@ export function WhatsAppCta({ message, className }: { message?: string; classNam
     <a
       href={href}
       target="_blank"
-      rel="noreferrer"
+      rel="noopener noreferrer"
       onClick={() => trackEvent("WhatsAppClick")}
       className={cn(
         "inline-flex h-12 items-center justify-center gap-2 rounded border border-ink-300 px-6 text-sm font-semibold text-ink-900 transition-colors duration-150 hover:border-ink-900",

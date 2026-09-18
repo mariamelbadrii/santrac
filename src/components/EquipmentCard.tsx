@@ -1,9 +1,18 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowLeft, MapPin } from "lucide-react";
 import type { EquipmentRow } from "@/lib/database.types";
-import { displayOrDash, equipmentTitle, formatPrice } from "@/lib/display";
+import {
+  displayOrDash,
+  equipmentTitle,
+  formatPrice,
+  localizeCategory,
+  localizeLocation,
+} from "@/lib/display";
 import { useI18n } from "@/lib/i18n";
+import { useEquipmentTypes } from "@/hooks/useEquipmentTypes";
 import { Badge } from "@/components/ui/Badge";
+import { Bdi } from "@/components/ui/Bdi";
+import { cn } from "@/lib/utils";
 
 const conditionTone: Record<EquipmentRow["condition"], "brand" | "neutral" | "success"> = {
   new: "success",
@@ -13,7 +22,10 @@ const conditionTone: Record<EquipmentRow["condition"], "brand" | "neutral" | "su
 
 export function EquipmentCard({ equipment }: { equipment: EquipmentRow }) {
   const { t, locale, dir } = useI18n();
+  const { types: categoryTypes } = useEquipmentTypes();
   const ArrowIcon = dir === "rtl" ? ArrowLeft : ArrowRight;
+  const category = localizeCategory(equipment.category, categoryTypes, locale);
+  const location = localizeLocation(equipment.location, locale);
 
   return (
     <Link
@@ -41,22 +53,31 @@ export function EquipmentCard({ equipment }: { equipment: EquipmentRow }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-2.5 p-5">
-        <span className="text-[0.6875rem] font-semibold uppercase tracking-widest2 text-brand-500">
-          {equipment.category}
+        <span
+          className={cn(
+            "text-[0.6875rem] font-semibold text-brand-500",
+            dir === "ltr" ? "uppercase tracking-widest2" : "tracking-normal",
+          )}
+        >
+          {category}
         </span>
         <h3 className="text-lg font-semibold leading-snug text-ink-900">
-          {equipmentTitle(equipment)}
+          <Bdi dir="ltr">{equipmentTitle(equipment)}</Bdi>
         </h3>
 
         <div className="flex flex-wrap items-center gap-1.5">
-          <Badge tone={conditionTone[equipment.condition]}>{equipment.condition}</Badge>
-          {equipment.year && <Badge>{equipment.year}</Badge>}
+          <Badge tone={conditionTone[equipment.condition]}>{t.enums.condition[equipment.condition]}</Badge>
+          {equipment.year && (
+            <Badge>
+              <Bdi dir="ltr">{equipment.year}</Bdi>
+            </Badge>
+          )}
         </div>
 
-        {equipment.location && (
+        {location && (
           <p className="flex items-center gap-1.5 text-sm text-ink-500">
             <MapPin aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
-            {displayOrDash(equipment.location)}
+            {displayOrDash(location)}
           </p>
         )}
 
