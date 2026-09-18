@@ -1,122 +1,169 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useEquipmentBySlug } from "@/hooks/useEquipmentList";
 import { displayOrDash, equipmentTitle, formatPrice } from "@/lib/display";
 import { WhatsAppCta } from "@/components/site/WhatsAppCta";
+import { Container } from "@/components/ui/Container";
+import { Badge } from "@/components/ui/Badge";
 import { trackEvent } from "@/lib/analytics";
+import { cn } from "@/lib/utils";
 
 export default function EquipmentDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const { t, locale } = useI18n();
+  const { t, locale, dir } = useI18n();
   const { equipment, loading } = useEquipmentBySlug(slug);
+  const [activeImage, setActiveImage] = useState(0);
+  const BackIcon = dir === "rtl" ? ArrowRight : ArrowLeft;
 
   useEffect(() => {
     if (equipment) trackEvent("ViewContent", { equipment_id: equipment.id });
   }, [equipment]);
 
-  if (loading) return <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-ink-500">…</div>;
+  if (loading) {
+    return (
+      <Container className="py-16">
+        <div className="grid gap-10 lg:grid-cols-2">
+          <div className="aspect-[4/3] animate-pulse rounded-lg bg-ink-50" />
+          <div className="space-y-4">
+            <div className="h-4 w-24 animate-pulse rounded bg-ink-50" />
+            <div className="h-9 w-2/3 animate-pulse rounded bg-ink-50" />
+            <div className="h-24 w-full animate-pulse rounded bg-ink-50" />
+          </div>
+        </div>
+      </Container>
+    );
+  }
 
   if (!equipment) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        <p className="text-sm text-ink-500">{t.equipment.noResults}</p>
-        <Link to="/equipment" className="mt-4 inline-block text-sm text-brand-600">
+      <Container className="py-20 text-center">
+        <p className="text-sm text-ink-500">{t.equipment.notFound}</p>
+        <Link to="/equipment" className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600">
+          <BackIcon aria-hidden="true" className="h-4 w-4" />
           {t.equipmentDetail.backToEquipment}
         </Link>
-      </div>
+      </Container>
     );
   }
 
   const whatsappMessage = `${t.equipmentDetail.whatsapp}: ${equipmentTitle(equipment)}`;
   const specEntries = Object.entries(equipment.specifications ?? {});
+  const gallery = [equipment.main_image, ...(equipment.additional_images ?? [])].filter(
+    (src): src is string => Boolean(src),
+  );
+  const description = locale === "ar" ? equipment.description_ar : equipment.description_en;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <Link to="/equipment" className="text-sm text-brand-600">
-        ← {t.equipmentDetail.backToEquipment}
+    <Container className="py-8 sm:py-12">
+      <Link
+        to="/equipment"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 hover:text-ink-900"
+      >
+        <BackIcon aria-hidden="true" className="h-4 w-4" />
+        {t.equipmentDetail.backToEquipment}
       </Link>
 
-      <div className="mt-4 grid gap-8 lg:grid-cols-2">
-        <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-ink-100">
-          {equipment.main_image ? (
-            <img
-              src={equipment.main_image}
-              alt={equipmentTitle(equipment)}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-ink-400">
-              {equipmentTitle(equipment)}
+      <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:gap-14">
+        <div>
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-ink-50">
+            {gallery.length > 0 ? (
+              <img
+                src={gallery[activeImage]}
+                alt={equipmentTitle(equipment)}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center font-medium text-ink-300">
+                {equipmentTitle(equipment)}
+              </div>
+            )}
+          </div>
+          {gallery.length > 1 && (
+            <div className="mt-3 flex gap-3 overflow-x-auto">
+              {gallery.map((src, i) => (
+                <button
+                  key={src + i}
+                  onClick={() => setActiveImage(i)}
+                  aria-label={`${equipmentTitle(equipment)} — image ${i + 1}`}
+                  aria-current={activeImage === i}
+                  className={cn(
+                    "h-16 w-20 shrink-0 overflow-hidden rounded border-2 transition-colors",
+                    activeImage === i ? "border-brand-500" : "border-transparent",
+                  )}
+                >
+                  <img src={src} alt="" className="h-full w-full object-cover" />
+                </button>
+              ))}
             </div>
           )}
         </div>
 
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wide text-brand-600">
+          <span className="text-xs font-semibold uppercase tracking-widest2 text-brand-500">
             {equipment.category}
           </span>
-          <h1 className="mt-2 text-3xl font-bold text-ink-900">{equipmentTitle(equipment)}</h1>
-          <p className="mt-2 text-xl font-semibold text-ink-900">
-            {formatPrice(equipment, locale)}
-          </p>
+          <h1 className="mt-2 text-display-sm font-bold text-ink-900">{equipmentTitle(equipment)}</h1>
 
-          <dl className="mt-6 grid grid-cols-2 gap-4 text-sm">
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            <Badge tone="neutral">{equipment.condition}</Badge>
+            {equipment.year && <Badge tone="neutral">{equipment.year}</Badge>}
+            <Badge tone={equipment.availability === "sold" ? "warning" : "success"}>
+              {equipment.availability.replace("_", " ")}
+            </Badge>
+          </div>
+
+          <p className="mt-5 text-2xl font-bold text-ink-900">{formatPrice(equipment, locale)}</p>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              to="/request-quote"
+              state={{ equipmentId: equipment.id, equipmentNeed: equipmentTitle(equipment) }}
+              className="inline-flex h-12 items-center justify-center rounded bg-brand-500 px-7 text-sm font-semibold text-white transition-colors duration-150 hover:bg-brand-600"
+            >
+              {t.equipmentDetail.requestQuote}
+            </Link>
+            <WhatsAppCta message={whatsappMessage} />
+          </div>
+
+          <dl className="mt-9 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-ink-100 pt-6 text-sm sm:grid-cols-3">
             <div>
-              <dt className="text-ink-500">{t.equipmentDetail.year}</dt>
-              <dd className="text-ink-900">{displayOrDash(equipment.year)}</dd>
+              <dt className="text-ink-400">{t.equipmentDetail.year}</dt>
+              <dd className="mt-0.5 font-medium text-ink-900">{displayOrDash(equipment.year)}</dd>
             </div>
             <div>
-              <dt className="text-ink-500">{t.equipmentDetail.condition}</dt>
-              <dd className="capitalize text-ink-900">{equipment.condition}</dd>
-            </div>
-            <div>
-              <dt className="text-ink-500">{t.equipmentDetail.location}</dt>
-              <dd className="text-ink-900">{displayOrDash(equipment.location)}</dd>
-            </div>
-            <div>
-              <dt className="text-ink-500">{t.equipmentDetail.availability}</dt>
-              <dd className="capitalize text-ink-900">{equipment.availability.replace("_", " ")}</dd>
+              <dt className="text-ink-400">{t.equipmentDetail.location}</dt>
+              <dd className="mt-0.5 font-medium text-ink-900">{displayOrDash(equipment.location)}</dd>
             </div>
           </dl>
 
           {specEntries.length > 0 && (
-            <div className="mt-6">
-              <h2 className="text-sm font-semibold text-ink-900">
+            <div className="mt-8 border-t border-ink-100 pt-6">
+              <h2 className="text-sm font-semibold uppercase tracking-widest2 text-ink-500">
                 {t.equipmentDetail.specifications}
               </h2>
-              <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
+              <dl className="mt-4 divide-y divide-ink-100">
                 {specEntries.map(([key, value]) => (
-                  <div key={key}>
+                  <div key={key} className="flex items-center justify-between py-2.5 text-sm">
                     <dt className="text-ink-500">{key}</dt>
-                    <dd className="text-ink-900">{String(value)}</dd>
+                    <dd className="font-medium text-ink-900">{String(value)}</dd>
                   </div>
                 ))}
               </dl>
             </div>
           )}
 
-          {(equipment.description_en || equipment.description_ar) && (
-            <div className="mt-6">
-              <h2 className="text-sm font-semibold text-ink-900">{t.equipmentDetail.description}</h2>
-              <p className="mt-2 text-sm text-ink-600">
-                {locale === "ar" ? equipment.description_ar : equipment.description_en}
-              </p>
+          {description && (
+            <div className="mt-8 border-t border-ink-100 pt-6">
+              <h2 className="text-sm font-semibold uppercase tracking-widest2 text-ink-500">
+                {t.equipmentDetail.description}
+              </h2>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-600">{description}</p>
             </div>
           )}
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              to="/request-quote"
-              state={{ equipmentId: equipment.id, equipmentNeed: equipmentTitle(equipment) }}
-              className="inline-flex h-11 items-center justify-center rounded-md bg-brand-600 px-6 text-sm font-medium text-white hover:bg-brand-700"
-            >
-              {t.equipmentDetail.requestQuote}
-            </Link>
-            <WhatsAppCta message={whatsappMessage} />
-          </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

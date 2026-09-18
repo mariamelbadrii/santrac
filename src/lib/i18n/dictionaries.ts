@@ -8,6 +8,8 @@ export interface Dictionary {
     about: string;
     contact: string;
     requestQuote: string;
+    explore: string;
+    getInTouch: string;
   };
   home: {
     eyebrow: string;
@@ -20,9 +22,16 @@ export interface Dictionary {
     categories: string;
     services: string;
     aboutPreview: string;
+    viewAll: string;
+    servicesCta: string;
+    aboutCta: string;
+    assistanceTitle: string;
+    assistanceBody: string;
   };
   equipment: {
+    eyebrow: string;
     title: string;
+    subtitle: string;
     searchPlaceholder: string;
     filters: string;
     category: string;
@@ -31,11 +40,20 @@ export interface Dictionary {
     location: string;
     availability: string;
     sortBy: string;
+    sortNewest: string;
+    sortFeatured: string;
     viewDetails: string;
     noResults: string;
     noInventory: string;
+    notFound: string;
+    all: string;
+    clearFilters: string;
+    showResults: string;
+    featuredBadge: string;
+    resultsCount: string;
   };
   equipmentDetail: {
+    overview: string;
     year: string;
     condition: string;
     location: string;
@@ -47,11 +65,13 @@ export interface Dictionary {
     backToEquipment: string;
   };
   services: {
+    eyebrow: string;
     title: string;
     subtitle: string;
   };
   about: {
     title: string;
+    eyebrow: string;
   };
   requestQuote: {
     title: string;
@@ -68,12 +88,15 @@ export interface Dictionary {
     submitting: string;
     success: string;
     error: string;
+    whatsappPrompt: string;
   };
   contact: {
     title: string;
+    subtitle: string;
     phone: string;
     email: string;
     whatsapp: string;
+    ctaText: string;
   };
   footer: {
     rights: string;
@@ -89,6 +112,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
       about: "About",
       contact: "Contact",
       requestQuote: "Request a Quote",
+      explore: "Explore",
+      getInTouch: "Get in Touch",
     },
     home: {
       eyebrow: "HEAVY & INDUSTRIAL EQUIPMENT",
@@ -99,12 +124,19 @@ export const dictionaries: Record<Locale, Dictionary> = {
       ctaSecondary: "Request a Quote",
       whySantrac: "Why SANTRAC",
       featured: "Featured Equipment",
-      categories: "Equipment Categories",
+      categories: "Browse by Category",
       services: "Services",
       aboutPreview: "About SANTRAC",
+      viewAll: "View all equipment",
+      servicesCta: "View services",
+      aboutCta: "Learn more about us",
+      assistanceTitle: "Need help choosing the right equipment?",
+      assistanceBody: "Message our team directly on WhatsApp — we'll help you find the right machine.",
     },
     equipment: {
+      eyebrow: "Catalogue",
       title: "Equipment",
+      subtitle: "Browse SANTRAC's available heavy and industrial equipment.",
       searchPlaceholder: "Search by brand or model",
       filters: "Filters",
       category: "Category",
@@ -112,12 +144,21 @@ export const dictionaries: Record<Locale, Dictionary> = {
       condition: "Condition",
       location: "Location",
       availability: "Availability",
-      sortBy: "Sort by",
+      sortBy: "Sort",
+      sortNewest: "Newest",
+      sortFeatured: "Featured first",
       viewDetails: "View Details",
       noResults: "No equipment matches your filters yet.",
       noInventory: "No equipment is listed yet. Check back soon.",
+      notFound: "We couldn't find that equipment listing.",
+      all: "All",
+      clearFilters: "Clear filters",
+      showResults: "Show results",
+      featuredBadge: "Featured",
+      resultsCount: "results",
     },
     equipmentDetail: {
+      overview: "Overview",
       year: "Year",
       condition: "Condition",
       location: "Location",
@@ -129,11 +170,13 @@ export const dictionaries: Record<Locale, Dictionary> = {
       backToEquipment: "Back to Equipment",
     },
     services: {
+      eyebrow: "What We Offer",
       title: "Services",
       subtitle: "What we offer alongside every sale.",
     },
     about: {
       title: "About SANTRAC",
+      eyebrow: "ESTABLISHED & TRUSTED",
     },
     requestQuote: {
       title: "Request a Quote",
@@ -150,12 +193,15 @@ export const dictionaries: Record<Locale, Dictionary> = {
       submitting: "Submitting…",
       success: "Thank you — we received your request and will be in touch shortly.",
       error: "Something went wrong. Please try again or contact us on WhatsApp.",
+      whatsappPrompt: "Prefer WhatsApp? Message us directly.",
     },
     contact: {
       title: "Contact",
+      subtitle: "Reach our team directly — by phone, email, or WhatsApp.",
       phone: "Phone",
       email: "Email",
       whatsapp: "WhatsApp",
+      ctaText: "Request a Quote",
     },
     footer: {
       rights: "All rights reserved.",
@@ -169,6 +215,8 @@ export const dictionaries: Record<Locale, Dictionary> = {
       about: "من نحن",
       contact: "تواصل معنا",
       requestQuote: "اطلب عرض سعر",
+      explore: "استكشف",
+      getInTouch: "تواصل معنا",
     },
     home: {
       eyebrow: "معدات ثقيلة وصناعية",
@@ -178,12 +226,19 @@ export const dictionaries: Record<Locale, Dictionary> = {
       ctaSecondary: "اطلب عرض سعر",
       whySantrac: "لماذا سانتراك",
       featured: "معدات مميزة",
-      categories: "فئات المعدات",
+      categories: "تصفح حسب الفئة",
       services: "الخدمات",
       aboutPreview: "عن سانتراك",
+      viewAll: "عرض كل المعدات",
+      servicesCta: "عرض الخدمات",
+      aboutCta: "المزيد عنا",
+      assistanceTitle: "تحتاج مساعدة في اختيار المعدة المناسبة؟",
+      assistanceBody: "راسل فريقنا مباشرة عبر واتساب وسنساعدك في إيجاد المعدة المناسبة.",
     },
     equipment: {
+      eyebrow: "الفهرس",
       title: "المعدات",
+      subtitle: "تصفح معدات سانتراك الثقيلة والصناعية المتوفرة.",
       searchPlaceholder: "ابحث بالماركة أو الموديل",
       filters: "الفلاتر",
       category: "الفئة",
@@ -191,12 +246,21 @@ export const dictionaries: Record<Locale, Dictionary> = {
       condition: "الحالة",
       location: "الموقع",
       availability: "التوفر",
-      sortBy: "الترتيب حسب",
+      sortBy: "الترتيب",
+      sortNewest: "الأحدث",
+      sortFeatured: "المميز أولاً",
       viewDetails: "عرض التفاصيل",
       noResults: "لا توجد معدات مطابقة للفلاتر المحددة.",
       noInventory: "لا توجد معدات مدرجة حاليًا. تابعونا قريبًا.",
+      notFound: "لم نتمكن من العثور على هذه المعدة.",
+      all: "الكل",
+      clearFilters: "مسح الفلاتر",
+      showResults: "عرض النتائج",
+      featuredBadge: "مميز",
+      resultsCount: "نتيجة",
     },
     equipmentDetail: {
+      overview: "نظرة عامة",
       year: "سنة الصنع",
       condition: "الحالة",
       location: "الموقع",
@@ -208,11 +272,13 @@ export const dictionaries: Record<Locale, Dictionary> = {
       backToEquipment: "العودة إلى المعدات",
     },
     services: {
+      eyebrow: "ما نقدمه",
       title: "الخدمات",
       subtitle: "ما نقدمه مع كل عملية بيع.",
     },
     about: {
       title: "عن سانتراك",
+      eyebrow: "شركة راسخة وموثوقة",
     },
     requestQuote: {
       title: "اطلب عرض سعر",
@@ -229,12 +295,15 @@ export const dictionaries: Record<Locale, Dictionary> = {
       submitting: "جارٍ الإرسال…",
       success: "شكرًا لك — تم استلام طلبك وسنتواصل معك قريبًا.",
       error: "حدث خطأ ما. يرجى المحاولة مرة أخرى أو التواصل معنا عبر واتساب.",
+      whatsappPrompt: "تفضل واتساب؟ راسلنا مباشرة.",
     },
     contact: {
       title: "تواصل معنا",
+      subtitle: "تواصل مع فريقنا مباشرة — عبر الهاتف أو البريد الإلكتروني أو واتساب.",
       phone: "الهاتف",
       email: "البريد الإلكتروني",
       whatsapp: "واتساب",
+      ctaText: "اطلب عرض سعر",
     },
     footer: {
       rights: "جميع الحقوق محفوظة.",

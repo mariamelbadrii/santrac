@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCircle2 } from "lucide-react";
 import { leadSchema, type LeadInput } from "@/lib/catalog-schemas";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { captureUTM, trackEvent } from "@/lib/analytics";
@@ -73,18 +74,25 @@ export function RequestQuoteForm({ equipmentId, prefillEquipmentNeed }: RequestQ
   };
 
   if (status === "success") {
-    return <p className="rounded-md bg-ink-50 p-4 text-sm text-ink-800">{t.requestQuote.success}</p>;
+    return (
+      <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-5">
+        <CheckCircle2 aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+        <p className="text-sm text-emerald-800">{t.requestQuote.success}</p>
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-      <Field label={t.requestQuote.fullName} htmlFor="full_name" required error={errors.full_name?.message}>
-        <Input id="full_name" {...register("full_name")} />
-      </Field>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field label={t.requestQuote.fullName} htmlFor="full_name" required error={errors.full_name?.message}>
+          <Input id="full_name" autoComplete="name" {...register("full_name")} />
+        </Field>
 
-      <Field label={t.requestQuote.phone} htmlFor="phone" required error={errors.phone?.message}>
-        <Input id="phone" type="tel" {...register("phone")} />
-      </Field>
+        <Field label={t.requestQuote.phone} htmlFor="phone" required error={errors.phone?.message}>
+          <Input id="phone" type="tel" autoComplete="tel" inputMode="tel" {...register("phone")} />
+        </Field>
+      </div>
 
       <Field
         label={t.requestQuote.equipmentNeed}
@@ -99,20 +107,22 @@ export function RequestQuoteForm({ equipmentId, prefillEquipmentNeed }: RequestQ
         <Input id="location" {...register("location")} />
       </Field>
 
-      <Field label={t.requestQuote.company} htmlFor="company">
-        <Input id="company" {...register("company")} />
-      </Field>
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field label={t.requestQuote.company} htmlFor="company">
+          <Input id="company" autoComplete="organization" {...register("company")} />
+        </Field>
 
-      <Field label={t.requestQuote.email} htmlFor="email" error={errors.email?.message}>
-        <Input id="email" type="email" {...register("email")} />
-      </Field>
+        <Field label={t.requestQuote.email} htmlFor="email" error={errors.email?.message}>
+          <Input id="email" type="email" autoComplete="email" {...register("email")} />
+        </Field>
+      </div>
 
       <Field label={t.requestQuote.brandModelPreference} htmlFor="brand_model_preference">
         <Input id="brand_model_preference" {...register("brand_model_preference")} />
       </Field>
 
       <Field label={t.requestQuote.additionalRequirements} htmlFor="additional_requirements">
-        <Textarea id="additional_requirements" rows={4} {...register("additional_requirements")} />
+        <Textarea id="additional_requirements" rows={3} {...register("additional_requirements")} />
       </Field>
 
       {/* Honeypot: hidden from real users, bots tend to fill every field */}
@@ -122,10 +132,12 @@ export function RequestQuoteForm({ equipmentId, prefillEquipmentNeed }: RequestQ
       </div>
 
       {status === "error" && (
-        <p className="text-sm text-brand-600">{t.requestQuote.error}</p>
+        <p className="text-sm font-medium text-brand-600" role="alert">
+          {t.requestQuote.error}
+        </p>
       )}
 
-      <Button type="submit" disabled={status === "submitting"}>
+      <Button type="submit" size="lg" disabled={status === "submitting"} className="w-full sm:w-auto">
         {status === "submitting" ? t.requestQuote.submitting : t.requestQuote.submit}
       </Button>
     </form>

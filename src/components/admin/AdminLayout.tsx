@@ -14,7 +14,15 @@ export function AdminLayout() {
   return (
     <div className="flex min-h-screen">
       <aside className="relative w-56 shrink-0 border-e border-ink-100 bg-ink-900 text-white">
-        <div className="p-4 text-lg font-bold">SANTRAC Admin</div>
+        <div className="p-4">
+          <p className="text-lg font-bold leading-none">
+            <span className="text-white">SAN</span>
+            <span className="text-brand-400">TRAC</span>
+          </p>
+          <p className="mt-1 text-[0.625rem] font-semibold uppercase tracking-widest2 text-ink-500">
+            Admin
+          </p>
+        </div>
         <nav className="flex flex-col gap-1 px-2">
           {links.map((link) => (
             <NavLink

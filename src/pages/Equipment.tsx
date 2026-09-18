@@ -1,22 +1,41 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { SlidersHorizontal, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useEquipmentList } from "@/hooks/useEquipmentList";
 import { EquipmentCard } from "@/components/EquipmentCard";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { Button } from "@/components/ui/Button";
+import { Container } from "@/components/ui/Container";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { trackEvent } from "@/lib/analytics";
+import { cn } from "@/lib/utils";
+
+type SortKey = "newest" | "featured";
 
 export default function Equipment() {
   const { t } = useI18n();
   const { equipment, loading } = useEquipmentList();
+  const [searchParams] = useSearchParams();
+
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(searchParams.get("category") ?? "");
   const [brand, setBrand] = useState("");
   const [condition, setCondition] = useState("");
+  const [sort, setSort] = useState<SortKey>("newest");
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     trackEvent("PageView", { page: "equipment" });
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [drawerOpen]);
 
   const categories = useMemo(
     () => Array.from(new Set(equipment.map((e) => e.category))).sort(),
@@ -27,69 +46,213 @@ export default function Equipment() {
     [equipment],
   );
 
-  const filtered = equipment.filter((item) => {
+  const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const matchesSearch =
-      !q || item.brand.toLowerCase().includes(q) || item.model.toLowerCase().includes(q);
-    const matchesCategory = !category || item.category === category;
-    const matchesBrand = !brand || item.brand === brand;
-    const matchesCondition = !condition || item.condition === condition;
-    return matchesSearch && matchesCategory && matchesBrand && matchesCondition;
-  });
+    const list = equipment.filter((item) => {
+      const matchesSearch =
+        !q || item.brand.toLowerCase().includes(q) || item.model.toLowerCase().includes(q);
+      const matchesCategory = !category || item.category === category;
+      const matchesBrand = !brand || item.brand === brand;
+      const matchesCondition = !condition || item.condition === condition;
+      return matchesSearch && matchesCategory && matchesBrand && matchesCondition;
+    });
 
-  return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-3xl font-bold text-ink-900">{t.equipment.title}</h1>
+    return [...list].sort((a, b) => {
+      if (sort === "featured") {
+        if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      }
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [equipment, search, category, brand, condition, sort]);
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  const hasActiveFilters = Boolean(search || category || brand || condition);
+
+  const clearFilters = () => {
+    setSearch("");
+    setCategory("");
+    setBrand("");
+    setCondition("");
+  };
+
+  const filterFields = (
+    <div className="flex flex-col gap-5">
+      <div>
+        <label htmlFor="equipment-search" className="mb-1.5 block text-sm font-medium text-ink-800">
+          {t.equipment.searchPlaceholder}
+        </label>
         <Input
+          id="equipment-search"
           placeholder={t.equipment.searchPlaceholder}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          aria-label={t.equipment.searchPlaceholder}
         />
-        <Select value={category} onChange={(e) => setCategory(e.target.value)} aria-label={t.equipment.category}>
-          <option value="">{t.equipment.category}</option>
+      </div>
+      <div>
+        <label htmlFor="equipment-category" className="mb-1.5 block text-sm font-medium text-ink-800">
+          {t.equipment.category}
+        </label>
+        <Select id="equipment-category" value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="">{t.equipment.all}</option>
           {categories.map((c) => (
             <option key={c} value={c}>
               {c}
             </option>
           ))}
         </Select>
-        <Select value={brand} onChange={(e) => setBrand(e.target.value)} aria-label={t.equipment.brand}>
-          <option value="">{t.equipment.brand}</option>
+      </div>
+      <div>
+        <label htmlFor="equipment-brand" className="mb-1.5 block text-sm font-medium text-ink-800">
+          {t.equipment.brand}
+        </label>
+        <Select id="equipment-brand" value={brand} onChange={(e) => setBrand(e.target.value)}>
+          <option value="">{t.equipment.all}</option>
           {brands.map((b) => (
             <option key={b} value={b}>
               {b}
             </option>
           ))}
         </Select>
-        <Select
-          value={condition}
-          onChange={(e) => setCondition(e.target.value)}
-          aria-label={t.equipment.condition}
-        >
-          <option value="">{t.equipment.condition}</option>
+      </div>
+      <div>
+        <label htmlFor="equipment-condition" className="mb-1.5 block text-sm font-medium text-ink-800">
+          {t.equipment.condition}
+        </label>
+        <Select id="equipment-condition" value={condition} onChange={(e) => setCondition(e.target.value)}>
+          <option value="">{t.equipment.all}</option>
           <option value="new">New</option>
           <option value="used">Used</option>
           <option value="refurbished">Refurbished</option>
         </Select>
       </div>
+      {hasActiveFilters && (
+        <button
+          onClick={clearFilters}
+          className="self-start text-sm font-semibold text-brand-600 hover:text-brand-700"
+        >
+          {t.equipment.clearFilters}
+        </button>
+      )}
+    </div>
+  );
 
-      <div className="mt-8">
-        {loading ? (
-          <p className="text-sm text-ink-500">…</p>
-        ) : equipment.length === 0 ? (
-          <p className="text-sm text-ink-500">{t.equipment.noInventory}</p>
-        ) : filtered.length === 0 ? (
-          <p className="text-sm text-ink-500">{t.equipment.noResults}</p>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((item) => (
-              <EquipmentCard key={item.id} equipment={item} />
-            ))}
+  return (
+    <div>
+      <div className="border-b border-ink-100 bg-ink-25">
+        <Container className="py-10 sm:py-12">
+          <Eyebrow>{t.equipment.eyebrow}</Eyebrow>
+          <h1 className="mt-2 text-display-sm font-bold text-ink-900">{t.equipment.title}</h1>
+          <p className="mt-2 max-w-xl text-[0.9375rem] text-ink-500">{t.equipment.subtitle}</p>
+        </Container>
+      </div>
+
+      <Container className="grid gap-10 py-10 lg:grid-cols-[260px_1fr] lg:py-12">
+        <aside className="hidden lg:block">
+          <div className="sticky top-24">
+            <h2 className="mb-5 text-xs font-semibold uppercase tracking-widest2 text-ink-500">
+              {t.equipment.filters}
+            </h2>
+            {filterFields}
           </div>
+        </aside>
+
+        <div>
+          <div className="mb-6 flex items-center justify-between gap-3">
+            <p className="text-sm text-ink-500">
+              {loading ? "…" : `${filtered.length} ${t.equipment.resultsCount}`}
+            </p>
+            <div className="flex items-center gap-3">
+              <Select
+                aria-label={t.equipment.sortBy}
+                value={sort}
+                onChange={(e) => setSort(e.target.value as SortKey)}
+                className="w-auto min-w-[9.5rem]"
+              >
+                <option value="newest">{t.equipment.sortNewest}</option>
+                <option value="featured">{t.equipment.sortFeatured}</option>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                className="lg:hidden"
+                onClick={() => setDrawerOpen(true)}
+              >
+                <SlidersHorizontal aria-hidden="true" className="h-4 w-4" />
+                {t.equipment.filters}
+              </Button>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="aspect-[4/3] animate-pulse rounded-lg bg-ink-50" />
+              ))}
+            </div>
+          ) : equipment.length === 0 ? (
+            <p className="py-16 text-center text-sm text-ink-500">{t.equipment.noInventory}</p>
+          ) : filtered.length === 0 ? (
+            <div className="py-16 text-center">
+              <p className="text-sm text-ink-500">{t.equipment.noResults}</p>
+              <button
+                onClick={clearFilters}
+                className="mt-3 text-sm font-semibold text-brand-600 hover:text-brand-700"
+              >
+                {t.equipment.clearFilters}
+              </button>
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {filtered.map((item) => (
+                <EquipmentCard key={item.id} equipment={item} />
+              ))}
+            </div>
+          )}
+        </div>
+      </Container>
+
+      {/* Mobile filter drawer */}
+      <div
+        className={cn(
+          "fixed inset-0 z-50 lg:hidden",
+          drawerOpen ? "pointer-events-auto" : "pointer-events-none",
         )}
+        aria-hidden={!drawerOpen}
+      >
+        <div
+          className={cn(
+            "absolute inset-0 bg-ink-900/40 transition-opacity duration-200",
+            drawerOpen ? "opacity-100" : "opacity-0",
+          )}
+          onClick={() => setDrawerOpen(false)}
+        />
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.equipment.filters}
+          className={cn(
+            "absolute inset-y-0 end-0 flex w-full max-w-sm flex-col bg-white shadow-panel transition-transform duration-200 ease-swift",
+            drawerOpen ? "translate-x-0" : "translate-x-full rtl:-translate-x-full",
+          )}
+        >
+          <div className="flex items-center justify-between border-b border-ink-100 px-5 py-4">
+            <h2 className="text-sm font-semibold uppercase tracking-widest2 text-ink-500">
+              {t.equipment.filters}
+            </h2>
+            <button
+              onClick={() => setDrawerOpen(false)}
+              aria-label="Close filters"
+              className="flex h-10 w-10 items-center justify-center text-ink-900"
+            >
+              <X aria-hidden="true" className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-5 py-5">{filterFields}</div>
+          <div className="border-t border-ink-100 px-5 py-4">
+            <Button className="w-full" onClick={() => setDrawerOpen(false)}>
+              {t.equipment.showResults} ({filtered.length})
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

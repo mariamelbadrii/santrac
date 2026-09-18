@@ -1,6 +1,15 @@
 import { Link } from "react-router-dom";
 import { useAdminEquipmentList } from "@/hooks/useAdminEquipment";
 import { equipmentTitle } from "@/lib/display";
+import { Badge } from "@/components/ui/Badge";
+import type { EquipmentStatus } from "@/lib/database.types";
+
+const statusTone: Record<EquipmentStatus, "success" | "neutral" | "warning" | "brand"> = {
+  published: "success",
+  draft: "neutral",
+  sold: "warning",
+  archived: "neutral",
+};
 
 export default function AdminInventoryList() {
   const { equipment, loading } = useAdminEquipmentList();
@@ -44,8 +53,10 @@ export default function AdminInventoryList() {
             ) : (
               equipment.map((item) => (
                 <tr key={item.id} className="border-t border-ink-100">
-                  <td className="px-4 py-3 text-ink-900">{equipmentTitle(item)}</td>
-                  <td className="px-4 py-3 capitalize text-ink-600">{item.status}</td>
+                  <td className="px-4 py-3 font-medium text-ink-900">{equipmentTitle(item)}</td>
+                  <td className="px-4 py-3">
+                    <Badge tone={statusTone[item.status]}>{item.status}</Badge>
+                  </td>
                   <td className="px-4 py-3 capitalize text-ink-600">
                     {item.availability.replace("_", " ")}
                   </td>

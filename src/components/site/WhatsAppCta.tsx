@@ -1,8 +1,10 @@
+import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/config";
 import { trackEvent } from "@/lib/analytics";
 import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
-export function WhatsAppCta({ message }: { message?: string }) {
+export function WhatsAppCta({ message, className }: { message?: string; className?: string }) {
   const { t } = useI18n();
   const href = whatsappLink(message);
   if (!href) return null;
@@ -13,8 +15,12 @@ export function WhatsAppCta({ message }: { message?: string }) {
       target="_blank"
       rel="noreferrer"
       onClick={() => trackEvent("WhatsAppClick")}
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-ink-300 px-5 text-sm font-medium text-ink-900 hover:bg-ink-50"
+      className={cn(
+        "inline-flex h-12 items-center justify-center gap-2 rounded border border-ink-300 px-6 text-sm font-semibold text-ink-900 transition-colors duration-150 hover:border-ink-900",
+        className,
+      )}
     >
+      <MessageCircle aria-hidden="true" className="h-[18px] w-[18px]" />
       {t.equipmentDetail.whatsapp}
     </a>
   );
