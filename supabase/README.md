@@ -22,11 +22,17 @@ the root-level chat summary for exactly what's needed to connect one.
    rejects every request with "permission denied for table ..." before RLS
    ever runs — RLS policies stay the authorization layer, these grants only
    open the table-level door PostgREST checks first.
+6. `0006_seed_telehandler_category.sql` — seeds the first `equipment_types`
+   row (`Telehandler` / `تلي هاندلر`) so existing equipment whose
+   `category = 'Telehandler'` (e.g. the JCB 537) has a category to resolve
+   against. `/admin/categories` is where you manage this list going
+   forward — the admin equipment form has no free-text category fallback
+   any more, so every category equipment can use must exist there first.
 
 ## To connect a real backend
 
 1. Create a Supabase project (directly, or via Lovable Cloud).
-2. Apply all five migrations above, in order — via the Supabase SQL editor
+2. Apply all six migrations above, in order — via the Supabase SQL editor
    (paste each file's contents and run) or the CLI:
    ```
    supabase db push

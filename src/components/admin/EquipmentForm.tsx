@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
 import { Plus, X } from "lucide-react";
 import { equipmentSchema, type EquipmentInput } from "@/lib/catalog-schemas";
 import type { EquipmentRow } from "@/lib/database.types";
@@ -33,7 +34,7 @@ function rowsToSpecs(rows: SpecRow[]): Record<string, string> {
 }
 
 export function EquipmentForm({ initialValues, onSubmit, submitLabel }: EquipmentFormProps) {
-  const { types: categories } = useEquipmentTypes();
+  const { types: categories, loading: categoriesLoading } = useEquipmentTypes();
   const [mainImage, setMainImage] = useState<string | null>(initialValues?.main_image ?? null);
   const [gallery, setGallery] = useState<string[]>(initialValues?.additional_images ?? []);
   const [specRows, setSpecRows] = useState<SpecRow[]>(specsToRows(initialValues?.specifications));
@@ -94,7 +95,9 @@ export function EquipmentForm({ initialValues, onSubmit, submitLabel }: Equipmen
         <Input id="slug" {...register("slug")} />
       </Field>
       <Field label="Category" htmlFor="category" required error={errors.category?.message}>
-        {categories.length > 0 ? (
+        {categoriesLoading ? (
+          <p className="text-sm text-ink-500">Loading categories…</p>
+        ) : categories.length > 0 ? (
           <Select id="category" {...register("category")}>
             <option value="">Select a category</option>
             {categories.map((c) => (
@@ -104,7 +107,13 @@ export function EquipmentForm({ initialValues, onSubmit, submitLabel }: Equipmen
             ))}
           </Select>
         ) : (
-          <Input id="category" {...register("category")} placeholder="e.g. Forklift" />
+          <p className="text-sm text-ink-500">
+            No categories yet.{" "}
+            <Link to="/admin/categories" className="font-semibold text-brand-600 hover:text-brand-700">
+              Create one in Categories
+            </Link>{" "}
+            before adding equipment.
+          </p>
         )}
       </Field>
       <Field label="Brand" htmlFor="brand" required error={errors.brand?.message}>
