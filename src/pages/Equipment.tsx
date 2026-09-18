@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { SlidersHorizontal, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useEquipmentList } from "@/hooks/useEquipmentList";
+import { useEquipmentTypes } from "@/hooks/useEquipmentTypes";
+import { localizeCategory } from "@/lib/display";
 import { EquipmentCard } from "@/components/EquipmentCard";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -18,8 +20,9 @@ import { TiltCard } from "@/components/motion/TiltCard";
 type SortKey = "newest" | "featured";
 
 export default function Equipment() {
-  const { t } = useI18n();
+  const { t, locale, dir } = useI18n();
   const { equipment, loading } = useEquipmentList();
+  const { types: categoryTypes } = useEquipmentTypes();
   const [searchParams] = useSearchParams();
 
   const [search, setSearch] = useState("");
@@ -98,7 +101,7 @@ export default function Equipment() {
           <option value="">{t.equipment.all}</option>
           {categories.map((c) => (
             <option key={c} value={c}>
-              {c}
+              {localizeCategory(c, categoryTypes, locale)}
             </option>
           ))}
         </Select>
@@ -122,9 +125,9 @@ export default function Equipment() {
         </label>
         <Select id="equipment-condition" value={condition} onChange={(e) => setCondition(e.target.value)}>
           <option value="">{t.equipment.all}</option>
-          <option value="new">New</option>
-          <option value="used">Used</option>
-          <option value="refurbished">Refurbished</option>
+          <option value="new">{t.enums.condition.new}</option>
+          <option value="used">{t.enums.condition.used}</option>
+          <option value="refurbished">{t.enums.condition.refurbished}</option>
         </Select>
       </div>
       {hasActiveFilters && (
@@ -153,7 +156,12 @@ export default function Equipment() {
       <Container className="grid gap-10 py-10 lg:grid-cols-[260px_1fr] lg:py-12">
         <aside className="hidden lg:block">
           <div className="sticky top-24">
-            <h2 className="mb-5 text-xs font-semibold uppercase tracking-widest2 text-ink-500">
+            <h2
+              className={cn(
+                "mb-5 text-xs font-semibold text-ink-500",
+                dir === "ltr" ? "uppercase tracking-widest2" : "tracking-normal",
+              )}
+            >
               {t.equipment.filters}
             </h2>
             {filterFields}
@@ -244,12 +252,17 @@ export default function Equipment() {
           )}
         >
           <div className="flex items-center justify-between border-b border-ink-100 px-5 py-4">
-            <h2 className="text-sm font-semibold uppercase tracking-widest2 text-ink-500">
+            <h2
+              className={cn(
+                "text-sm font-semibold text-ink-500",
+                dir === "ltr" ? "uppercase tracking-widest2" : "tracking-normal",
+              )}
+            >
               {t.equipment.filters}
             </h2>
             <button
               onClick={() => setDrawerOpen(false)}
-              aria-label="Close filters"
+              aria-label={t.equipment.closeFilters}
               className="flex h-10 w-10 items-center justify-center text-ink-900"
             >
               <X aria-hidden="true" className="h-5 w-5" />

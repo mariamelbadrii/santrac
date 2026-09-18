@@ -51,6 +51,7 @@ export interface Dictionary {
     showResults: string;
     featuredBadge: string;
     resultsCount: string;
+    closeFilters: string;
   };
   equipmentDetail: {
     overview: string;
@@ -162,6 +163,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       showResults: "Show results",
       featuredBadge: "Featured",
       resultsCount: "results",
+      closeFilters: "Close filters",
     },
     equipmentDetail: {
       overview: "Overview",
@@ -270,6 +272,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       showResults: "عرض النتائج",
       featuredBadge: "مميز",
       resultsCount: "نتيجة",
+      closeFilters: "إغلاق الفلاتر",
     },
     equipmentDetail: {
       overview: "نظرة عامة",
