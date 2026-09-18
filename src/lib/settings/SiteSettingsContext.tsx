@@ -8,6 +8,7 @@ import {
 } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { config } from "@/lib/config";
+import type { SiteSettingsRow } from "@/lib/database.types";
 
 export interface SiteSettingsValue {
   whatsappNumber: string;
@@ -105,6 +106,26 @@ export interface RawSiteSettings {
   youtube_url: string;
 }
 
+// Shared by the initial fetch and by the admin form after a save, so the
+// form always reflects exactly what's in the database (nulls -> "").
+export function toRawSiteSettings(data: SiteSettingsRow | null): RawSiteSettings {
+  return {
+    whatsapp_number: data?.whatsapp_number ?? "",
+    phone: data?.phone ?? "",
+    secondary_phone: data?.secondary_phone ?? "",
+    email: data?.email ?? "",
+    address_en: data?.address_en ?? "",
+    address_ar: data?.address_ar ?? "",
+    hours_en: data?.hours_en ?? "",
+    hours_ar: data?.hours_ar ?? "",
+    facebook_url: data?.facebook_url ?? "",
+    instagram_url: data?.instagram_url ?? "",
+    linkedin_url: data?.linkedin_url ?? "",
+    tiktok_url: data?.tiktok_url ?? "",
+    youtube_url: data?.youtube_url ?? "",
+  };
+}
+
 // For the admin settings form, which needs to see the *raw* saved row
 // (including blanks) rather than the env-merged public display values.
 export function useAdminSiteSettingsRaw() {
@@ -118,21 +139,7 @@ export function useAdminSiteSettingsRaw() {
       .eq("id", 1)
       .maybeSingle()
       .then(({ data }) => {
-        setRow({
-          whatsapp_number: data?.whatsapp_number ?? "",
-          phone: data?.phone ?? "",
-          secondary_phone: data?.secondary_phone ?? "",
-          email: data?.email ?? "",
-          address_en: data?.address_en ?? "",
-          address_ar: data?.address_ar ?? "",
-          hours_en: data?.hours_en ?? "",
-          hours_ar: data?.hours_ar ?? "",
-          facebook_url: data?.facebook_url ?? "",
-          instagram_url: data?.instagram_url ?? "",
-          linkedin_url: data?.linkedin_url ?? "",
-          tiktok_url: data?.tiktok_url ?? "",
-          youtube_url: data?.youtube_url ?? "",
-        });
+        setRow(toRawSiteSettings(data));
         setLoading(false);
       });
   }, []);

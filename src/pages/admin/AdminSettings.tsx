@@ -1,6 +1,10 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
-import { useAdminSiteSettingsRaw, type RawSiteSettings } from "@/lib/settings/SiteSettingsContext";
+import {
+  toRawSiteSettings,
+  useAdminSiteSettingsRaw,
+  type RawSiteSettings,
+} from "@/lib/settings/SiteSettingsContext";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
@@ -26,6 +30,7 @@ export default function AdminSettings() {
   const { row, loading } = useAdminSiteSettingsRaw();
   const [form, setForm] = useState<RawSiteSettings>(emptyForm);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (row) setForm(row);
@@ -34,8 +39,27 @@ export default function AdminSettings() {
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setStatus("saving");
-    const { error } = await supabase.from("site_settings").update(form).eq("id", 1);
-    setStatus(error ? "error" : "saved");
+    setErrorMessage(null);
+
+    // Upsert (not a plain update) so the singleton row is written correctly
+    // even if it were ever missing, and .select().single() hands back what
+    // was actually persisted so the form re-syncs to the real saved state
+    // instead of trusting the values we optimistically typed in.
+    const { data, error } = await supabase
+      .from("site_settings")
+      .upsert({ id: 1, ...form }, { onConflict: "id" })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Failed to save site settings:", error);
+      setErrorMessage(error.message);
+      setStatus("error");
+      return;
+    }
+
+    setForm(toRawSiteSettings(data));
+    setStatus("saved");
   };
 
   const update =
@@ -43,6 +67,7 @@ export default function AdminSettings() {
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setForm((prev) => ({ ...prev, [key]: event.target.value }));
       setStatus("idle");
+      setErrorMessage(null);
     };
 
   if (loading) return <p className="text-sm text-ink-500">Loading…</p>;
@@ -117,8 +142,12 @@ export default function AdminSettings() {
           <Button type="submit" disabled={status === "saving"}>
             {status === "saving" ? "Saving…" : "Save changes"}
           </Button>
-          {status === "saved" && <span className="ms-3 text-sm text-emerald-600">Saved.</span>}
-          {status === "error" && <span className="ms-3 text-sm text-brand-600">Something went wrong.</span>}
+          {status === "saved" && <span className="ms-3 text-sm text-emerald-600">Settings saved.</span>}
+          {status === "error" && (
+            <span className="ms-3 text-sm text-brand-600">
+              {errorMessage ? `Couldn't save: ${errorMessage}` : "Something went wrong."}
+            </span>
+          )}
         </div>
       </form>
     </div>
