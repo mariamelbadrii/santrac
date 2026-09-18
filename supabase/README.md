@@ -16,11 +16,17 @@ the root-level chat summary for exactly what's needed to connect one.
    TikTok/YouTube).
 4. `0004_equipment_image_storage.sql` — the `equipment-images` storage
    bucket and its public-read / admin-write policies.
+5. `0005_api_table_grants.sql` — explicit `grant`s of table privileges to
+   the `anon`/`authenticated` API roles on `equipment`, `equipment_types`,
+   `leads`, `site_settings`, and `user_roles`. Without these, PostgREST
+   rejects every request with "permission denied for table ..." before RLS
+   ever runs — RLS policies stay the authorization layer, these grants only
+   open the table-level door PostgREST checks first.
 
 ## To connect a real backend
 
 1. Create a Supabase project (directly, or via Lovable Cloud).
-2. Apply all four migrations above, in order — via the Supabase SQL editor
+2. Apply all five migrations above, in order — via the Supabase SQL editor
    (paste each file's contents and run) or the CLI:
    ```
    supabase db push
