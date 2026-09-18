@@ -15,7 +15,7 @@ const wordVariants = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: EASE_OUT, delay: 0.15 + i * 0.07 },
+    transition: { duration: 0.8, ease: EASE_OUT, delay: 0.5 + i * 0.07 },
   }),
 };
 
@@ -52,12 +52,25 @@ export function CinematicHero() {
 
   const gridY = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const glowY = useTransform(scrollYProgress, [0, 1], [0, -80]);
-  const iconY = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const iconY = useTransform(scrollYProgress, [0, 1], [0, 220]);
+  const iconScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 60]);
+  const contentScale = useTransform(scrollYProgress, [0, 1], [1, 0.94]);
 
   return (
-    <div ref={ref} className="relative flex min-h-[92svh] items-center overflow-hidden bg-ink-950">
+    <div ref={ref} className="relative flex min-h-[100svh] items-center overflow-hidden bg-ink-950">
+      {/* Curtain — a single cinematic reveal beat on first paint. */}
+      {!reduceMotion && (
+        <motion.div
+          aria-hidden="true"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 0 }}
+          transition={{ duration: 1.1, ease: EASE_OUT, delay: 0.15 }}
+          className="pointer-events-none absolute inset-0 z-20 bg-ink-950"
+        />
+      )}
+
       {/* Layer 1 — blueprint grid, deepest, moves slowest */}
       <motion.div
         aria-hidden="true"
@@ -69,32 +82,36 @@ export function CinematicHero() {
       <motion.div
         aria-hidden="true"
         style={reduceMotion ? undefined : { y: glowY }}
-        className="absolute -end-40 top-1/3 h-[560px] w-[560px] rounded-full bg-brand-600/25 blur-[120px]"
+        className="absolute -end-40 top-1/4 h-[640px] w-[640px] rounded-full bg-brand-600/30 blur-[130px]"
       />
       <motion.div
         aria-hidden="true"
         style={reduceMotion ? undefined : { y: glowY }}
-        className="absolute -start-32 bottom-0 h-[420px] w-[420px] rounded-full bg-brand-900/40 blur-[100px]"
+        className="absolute -start-32 bottom-0 h-[480px] w-[480px] rounded-full bg-brand-900/50 blur-[110px]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-500/70 to-transparent"
       />
 
       {/* Layer 3 — oversized forklift silhouette, nearest, moves fastest */}
       <motion.div
         aria-hidden="true"
-        style={reduceMotion ? undefined : { y: iconY }}
+        style={reduceMotion ? undefined : { y: iconY, scale: iconScale }}
         className="pointer-events-none absolute -end-24 bottom-0 hidden lg:block"
       >
-        <Forklift className="h-[560px] w-[560px] text-white/[0.05]" strokeWidth={0.6} />
+        <Forklift className="h-[620px] w-[620px] text-white/[0.06]" strokeWidth={0.55} />
       </motion.div>
 
       {/* Foreground content */}
       <motion.div
-        style={reduceMotion ? undefined : { opacity: contentOpacity, y: contentY }}
+        style={reduceMotion ? undefined : { opacity: contentOpacity, y: contentY, scale: contentScale }}
         className="relative z-10 mx-auto w-full max-w-container px-5 sm:px-8"
       >
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: EASE_OUT }}
+          transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.35 }}
           className="text-xs font-semibold uppercase tracking-widest2 text-brand-400"
         >
           {t.home.eyebrow}
@@ -107,7 +124,7 @@ export function CinematicHero() {
         <motion.p
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.55 }}
+          transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.95 }}
           className="mt-6 max-w-lg text-[1.0625rem] leading-relaxed text-ink-300"
         >
           {t.home.subtitle}
@@ -116,7 +133,7 @@ export function CinematicHero() {
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: EASE_OUT, delay: 0.7 }}
+          transition={{ duration: 0.7, ease: EASE_OUT, delay: 1.1 }}
           className="mt-10 flex flex-wrap gap-3"
         >
           <Link
@@ -139,7 +156,7 @@ export function CinematicHero() {
         aria-hidden="true"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 1.1 }}
+        transition={{ duration: 0.6, delay: 1.5 }}
         style={reduceMotion ? undefined : { opacity: contentOpacity }}
         className="absolute bottom-8 start-1/2 z-10 -translate-x-1/2 rtl:translate-x-1/2"
       >

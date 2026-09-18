@@ -9,6 +9,7 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { CinematicHero } from "@/components/home/CinematicHero";
+import { ScrollRevealStatement } from "@/components/home/ScrollRevealStatement";
 import { Reveal } from "@/components/motion/Reveal";
 import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { TiltCard } from "@/components/motion/TiltCard";
@@ -28,6 +29,40 @@ const serviceThemes = [
   { en: "After-Sales Support", ar: "دعم ما بعد البيع" },
 ] as const;
 
+const statementWords = {
+  en: [
+    { text: "Every" },
+    { text: "machine" },
+    { text: "is" },
+    { text: "inspected,", emphasis: true },
+    { text: "sourced" },
+    { text: "with" },
+    { text: "care," },
+    { text: "and" },
+    { text: "backed" },
+    { text: "by" },
+    { text: "a" },
+    { text: "team" },
+    { text: "you" },
+    { text: "can" },
+    { text: "trust.", emphasis: true },
+  ],
+  ar: [
+    { text: "يتم" },
+    { text: "فحص", emphasis: true },
+    { text: "كل" },
+    { text: "معدة،" },
+    { text: "وتوريدها" },
+    { text: "بعناية،" },
+    { text: "ويقف" },
+    { text: "خلفها" },
+    { text: "فريق" },
+    { text: "يمكنك" },
+    { text: "الثقة", emphasis: true },
+    { text: "به." },
+  ],
+} as const;
+
 export default function Home() {
   const { t, locale, dir } = useI18n();
   const { equipment, loading } = useEquipmentList();
@@ -43,10 +78,18 @@ export default function Home() {
     <div>
       <CinematicHero />
 
+      <ScrollRevealStatement words={[...statementWords[locale]]} />
+
       {/* Featured equipment */}
       {!loading && featured.length > 0 && (
-        <section className="py-16 sm:py-20">
-          <Container>
+        <section className="relative overflow-hidden py-16 sm:py-20">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-6 text-[8rem] font-display font-extrabold leading-none text-ink-50 sm:text-[10rem] -start-4"
+          >
+            01
+          </span>
+          <Container className="relative">
             <Reveal>
               <SectionHeader
                 title={t.home.featured}
@@ -76,8 +119,14 @@ export default function Home() {
 
       {/* Categories */}
       {!loading && categories.length > 0 && (
-        <section className="border-t border-ink-100 py-16 sm:py-20">
-          <Container>
+        <section className="relative overflow-hidden border-t border-ink-100 py-16 sm:py-20">
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-6 text-[8rem] font-display font-extrabold leading-none text-ink-50 sm:text-[10rem] -start-4"
+          >
+            02
+          </span>
+          <Container className="relative">
             <Reveal>
               <SectionHeader title={t.home.categories} />
             </Reveal>
@@ -98,8 +147,14 @@ export default function Home() {
       )}
 
       {/* Why SANTRAC */}
-      <section className="border-t border-ink-100 bg-ink-25 py-16 sm:py-20">
-        <Container>
+      <section className="relative overflow-hidden border-t border-ink-100 bg-ink-25 py-16 sm:py-20">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 text-[8rem] font-display font-extrabold leading-none text-ink-100/60 sm:text-[10rem]"
+        >
+          03
+        </span>
+        <Container className="relative">
           <Reveal>
             <SectionHeader title={t.home.whySantrac} align="center" />
           </Reveal>
@@ -120,8 +175,14 @@ export default function Home() {
       </section>
 
       {/* Services preview */}
-      <section className="border-t border-ink-100 py-16 sm:py-20">
-        <Container>
+      <section className="relative overflow-hidden border-t border-ink-100 py-16 sm:py-20">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-6 text-[8rem] font-display font-extrabold leading-none text-ink-50 sm:text-[10rem] -start-4"
+        >
+          04
+        </span>
+        <Container className="relative">
           <Reveal>
             <SectionHeader
               title={t.home.services}
