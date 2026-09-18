@@ -1,32 +1,36 @@
 import { Link } from "react-router-dom";
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, MessageCircle, Phone } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { config, whatsappLink } from "@/lib/config";
+import { whatsappLink } from "@/lib/config";
+import { useSiteSettings } from "@/lib/settings/SiteSettingsContext";
 import { trackEvent } from "@/lib/analytics";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { Reveal } from "@/components/motion/Reveal";
+import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 
 export default function Contact() {
   const { t } = useI18n();
-  const waHref = whatsappLink();
+  const settings = useSiteSettings();
+  const waHref = whatsappLink(undefined, settings.whatsappNumber);
 
   const channels = [
-    config.contact.phone
+    settings.phone
       ? {
           icon: Phone,
           label: t.contact.phone,
-          value: config.contact.phone,
-          href: `tel:${config.contact.phone}`,
+          value: settings.phone,
+          href: `tel:${settings.phone}`,
           external: false,
           onClick: () => trackEvent("CallClick"),
         }
       : null,
-    config.contact.email
+    settings.email
       ? {
           icon: Mail,
           label: t.contact.email,
-          value: config.contact.email,
-          href: `mailto:${config.contact.email}`,
+          value: settings.email,
+          href: `mailto:${settings.email}`,
           external: false,
           onClick: undefined,
         }
@@ -35,7 +39,7 @@ export default function Contact() {
       ? {
           icon: MessageCircle,
           label: t.contact.whatsapp,
-          value: config.contact.whatsappNumber || t.contact.whatsapp,
+          value: settings.whatsappNumber || t.contact.whatsapp,
           href: waHref,
           external: true,
           onClick: () => trackEvent("WhatsAppClick"),
@@ -43,47 +47,86 @@ export default function Contact() {
       : null,
   ].filter((channel): channel is NonNullable<typeof channel> => channel !== null);
 
+  const socialLinks = [
+    settings.facebookUrl && { icon: Facebook, href: settings.facebookUrl, label: "Facebook" },
+    settings.instagramUrl && { icon: Instagram, href: settings.instagramUrl, label: "Instagram" },
+    settings.linkedinUrl && { icon: Linkedin, href: settings.linkedinUrl, label: "LinkedIn" },
+  ].filter((link): link is { icon: typeof Facebook; href: string; label: string } => Boolean(link));
+
   return (
     <div className="border-t border-ink-100">
-      <Container className="max-w-2xl py-14 sm:py-20">
-        <Eyebrow>{t.nav.getInTouch}</Eyebrow>
-        <h1 className="mt-2 text-display-sm font-bold text-ink-900">{t.contact.title}</h1>
-        <p className="mt-2 text-[0.9375rem] text-ink-500">{t.contact.subtitle}</p>
+      <Container className="grid gap-14 py-14 sm:py-20 lg:grid-cols-[1fr_360px] lg:gap-16">
+        <div className="max-w-2xl">
+          <Reveal>
+            <Eyebrow>{t.nav.getInTouch}</Eyebrow>
+            <h1 className="mt-2 text-display-sm font-bold text-ink-900">{t.contact.title}</h1>
+            <p className="mt-2 text-[0.9375rem] text-ink-500">{t.contact.subtitle}</p>
+          </Reveal>
 
-        <div className="mt-9 divide-y divide-ink-100 border-y border-ink-100">
-          {channels.map((channel) => {
-            const Icon = channel.icon;
-            return (
-              <a
-                key={channel.label}
-                href={channel.href}
-                target={channel.external ? "_blank" : undefined}
-                rel={channel.external ? "noreferrer" : undefined}
-                onClick={channel.onClick}
-                className="group flex items-center gap-4 py-5 transition-colors hover:bg-ink-25"
-              >
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink-50 text-ink-500 group-hover:bg-brand-50 group-hover:text-brand-500">
-                  <Icon aria-hidden="true" className="h-5 w-5" />
-                </span>
-                <span>
-                  <span className="block text-xs font-semibold uppercase tracking-widest2 text-ink-400">
-                    {channel.label}
-                  </span>
-                  <span className="block text-[0.9375rem] font-medium text-ink-900" dir="ltr">
-                    {channel.value}
-                  </span>
-                </span>
-              </a>
-            );
-          })}
+          <Stagger as="div" className="mt-9 divide-y divide-ink-100 border-y border-ink-100">
+            {channels.map((channel) => {
+              const Icon = channel.icon;
+              return (
+                <StaggerItem key={channel.label}>
+                  <a
+                    href={channel.href}
+                    target={channel.external ? "_blank" : undefined}
+                    rel={channel.external ? "noreferrer" : undefined}
+                    onClick={channel.onClick}
+                    className="group flex items-center gap-4 py-5 transition-colors hover:bg-ink-25"
+                  >
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink-50 text-ink-500 transition-colors group-hover:bg-brand-50 group-hover:text-brand-500">
+                      <Icon aria-hidden="true" className="h-5 w-5" />
+                    </span>
+                    <span>
+                      <span className="block text-xs font-semibold uppercase tracking-widest2 text-ink-400">
+                        {channel.label}
+                      </span>
+                      <span className="block text-[0.9375rem] font-medium text-ink-900" dir="ltr">
+                        {channel.value}
+                      </span>
+                    </span>
+                  </a>
+                </StaggerItem>
+              );
+            })}
+          </Stagger>
+
+          <Reveal delay={0.1}>
+            <Link
+              to="/request-quote"
+              className="mt-9 inline-flex h-12 items-center justify-center rounded bg-brand-500 px-7 text-sm font-semibold text-white transition-colors duration-150 hover:bg-brand-600"
+            >
+              {t.contact.ctaText}
+            </Link>
+          </Reveal>
         </div>
 
-        <Link
-          to="/request-quote"
-          className="mt-9 inline-flex h-12 items-center justify-center rounded bg-brand-500 px-7 text-sm font-semibold text-white transition-colors duration-150 hover:bg-brand-600"
-        >
-          {t.contact.ctaText}
-        </Link>
+        <Reveal delay={0.15} className="lg:pt-16">
+          <div className="rounded-lg bg-ink-900 p-7">
+            <p className="font-display text-lg font-bold text-white">
+              <span className="text-white">SAN</span>
+              <span className="text-brand-400">TRAC</span>
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-ink-400">{t.home.assistanceBody}</p>
+            {socialLinks.length > 0 && (
+              <div className="mt-6 flex items-center gap-3">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={social.label}
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-ink-300 transition-colors hover:border-white/30 hover:text-white"
+                  >
+                    <social.icon aria-hidden="true" className="h-4 w-4" />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </Reveal>
       </Container>
     </div>
   );

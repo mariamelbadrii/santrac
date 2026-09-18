@@ -1,5 +1,10 @@
 // Central runtime configuration. Values come from environment variables only —
 // never hardcode contact details, tracking IDs, or credentials here.
+//
+// These are the *fallback* defaults. Once a Supabase project is connected,
+// admins can override the contact/social fields at /admin/settings — see
+// src/lib/settings/SiteSettingsContext.tsx, which merges the live
+// `site_settings` row over these env defaults.
 
 export const config = {
   supabase: {
@@ -11,6 +16,11 @@ export const config = {
     phone: import.meta.env.VITE_CONTACT_PHONE ?? "",
     email: import.meta.env.VITE_CONTACT_EMAIL ?? "",
   },
+  social: {
+    facebookUrl: import.meta.env.VITE_FACEBOOK_URL ?? "",
+    instagramUrl: import.meta.env.VITE_INSTAGRAM_URL ?? "",
+    linkedinUrl: import.meta.env.VITE_LINKEDIN_URL ?? "",
+  },
   analytics: {
     ga4MeasurementId: import.meta.env.VITE_GA4_MEASUREMENT_ID ?? "",
     metaPixelId: import.meta.env.VITE_META_PIXEL_ID ?? "",
@@ -18,8 +28,9 @@ export const config = {
   },
 } as const;
 
-export function whatsappLink(message?: string): string | null {
-  if (!config.contact.whatsappNumber) return null;
-  const base = `https://wa.me/${config.contact.whatsappNumber.replace(/[^\d]/g, "")}`;
+export function whatsappLink(message?: string, numberOverride?: string): string | null {
+  const number = numberOverride || config.contact.whatsappNumber;
+  if (!number) return null;
+  const base = `https://wa.me/${number.replace(/[^\d]/g, "")}`;
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }

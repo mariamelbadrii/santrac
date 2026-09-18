@@ -5,6 +5,7 @@ import { RequestQuoteForm } from "@/components/RequestQuoteForm";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { WhatsAppCta } from "@/components/site/WhatsAppCta";
+import { Reveal } from "@/components/motion/Reveal";
 
 interface LocationState {
   equipmentId?: string;
@@ -25,19 +26,21 @@ export default function RequestQuote() {
     <div className="border-t border-ink-100">
       <Container className="grid gap-12 py-12 sm:py-16 lg:grid-cols-[1fr_360px] lg:gap-16">
         <div className="max-w-xl">
-          <Eyebrow>{t.nav.getInTouch}</Eyebrow>
-          <h1 className="mt-2 text-display-sm font-bold text-ink-900">{t.requestQuote.title}</h1>
-          <p className="mt-2 text-[0.9375rem] text-ink-500">{t.requestQuote.subtitle}</p>
+          <Reveal>
+            <Eyebrow>{t.nav.getInTouch}</Eyebrow>
+            <h1 className="mt-2 text-display-sm font-bold text-ink-900">{t.requestQuote.title}</h1>
+            <p className="mt-2 text-[0.9375rem] text-ink-500">{t.requestQuote.subtitle}</p>
+          </Reveal>
 
-          <div className="mt-8">
+          <Reveal delay={0.08} className="mt-8">
             <RequestQuoteForm
               equipmentId={state.equipmentId}
               prefillEquipmentNeed={state.equipmentNeed}
             />
-          </div>
+          </Reveal>
         </div>
 
-        <aside className="flex flex-col gap-6">
+        <Reveal delay={0.15} as="aside" className="flex flex-col gap-6">
           <div className="rounded-lg border border-ink-100 bg-ink-25 p-6">
             <p className="flex items-center gap-2 text-sm font-semibold text-ink-900">
               <MessageCircle aria-hidden="true" className="h-4 w-4 text-brand-500" />
@@ -59,7 +62,7 @@ export default function RequestQuote() {
               );
             })}
           </ul>
-        </aside>
+        </Reveal>
       </Container>
     </div>
   );

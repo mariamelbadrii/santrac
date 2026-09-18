@@ -11,6 +11,9 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { Reveal } from "@/components/motion/Reveal";
+import { Stagger, StaggerItem } from "@/components/motion/Stagger";
+import { TiltCard } from "@/components/motion/TiltCard";
 
 type SortKey = "newest" | "featured";
 
@@ -139,9 +142,11 @@ export default function Equipment() {
     <div>
       <div className="border-b border-ink-100 bg-ink-25">
         <Container className="py-10 sm:py-12">
-          <Eyebrow>{t.equipment.eyebrow}</Eyebrow>
-          <h1 className="mt-2 text-display-sm font-bold text-ink-900">{t.equipment.title}</h1>
-          <p className="mt-2 max-w-xl text-[0.9375rem] text-ink-500">{t.equipment.subtitle}</p>
+          <Reveal>
+            <Eyebrow>{t.equipment.eyebrow}</Eyebrow>
+            <h1 className="mt-2 text-display-sm font-bold text-ink-900">{t.equipment.title}</h1>
+            <p className="mt-2 max-w-xl text-[0.9375rem] text-ink-500">{t.equipment.subtitle}</p>
+          </Reveal>
         </Container>
       </div>
 
@@ -201,11 +206,15 @@ export default function Equipment() {
               </button>
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <Stagger className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {filtered.map((item) => (
-                <EquipmentCard key={item.id} equipment={item} />
+                <StaggerItem key={item.id}>
+                  <TiltCard className="h-full">
+                    <EquipmentCard equipment={item} />
+                  </TiltCard>
+                </StaggerItem>
               ))}
-            </div>
+            </Stagger>
           )}
         </div>
       </Container>

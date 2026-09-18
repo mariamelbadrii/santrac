@@ -2,6 +2,8 @@ import { useI18n } from "@/lib/i18n";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { WhatsAppCta } from "@/components/site/WhatsAppCta";
+import { Reveal } from "@/components/motion/Reveal";
+import { Stagger, StaggerItem } from "@/components/motion/Stagger";
 import { Link } from "react-router-dom";
 
 const services = [
@@ -54,20 +56,22 @@ export default function Services() {
     <div>
       <div className="border-b border-ink-100 bg-ink-25">
         <Container className="py-14 sm:py-16">
-          <Eyebrow>{t.services.eyebrow}</Eyebrow>
-          <h1 className="mt-2 max-w-xl text-display-md font-bold text-ink-900">{t.services.title}</h1>
-          <p className="mt-3 max-w-lg text-[0.9375rem] text-ink-500">{t.services.subtitle}</p>
+          <Reveal>
+            <Eyebrow>{t.services.eyebrow}</Eyebrow>
+            <h1 className="mt-2 max-w-xl text-display-md font-bold text-ink-900">{t.services.title}</h1>
+            <p className="mt-3 max-w-lg text-[0.9375rem] text-ink-500">{t.services.subtitle}</p>
+          </Reveal>
         </Container>
       </div>
 
       <Container className="py-14 sm:py-16">
-        <div className="divide-y divide-ink-100 border-t border-ink-100">
+        <Stagger className="divide-y divide-ink-100 border-t border-ink-100">
           {services.map((service, index) => (
-            <div
+            <StaggerItem
               key={service.en.title}
               className="grid gap-4 py-10 sm:grid-cols-[auto_1fr] sm:gap-10"
             >
-              <span className="text-sm font-semibold text-brand-500">
+              <span className="font-display text-sm font-bold text-brand-500">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <div className="max-w-2xl">
@@ -76,23 +80,25 @@ export default function Services() {
                   {service[locale].body}
                 </p>
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </Container>
 
       <div className="border-t border-ink-100 bg-ink-25">
         <Container className="flex flex-col items-center gap-5 py-14 text-center">
-          <p className="text-lg font-semibold text-ink-900">{t.home.assistanceTitle}</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link
-              to="/request-quote"
-              className="inline-flex h-12 items-center justify-center rounded bg-brand-500 px-7 text-sm font-semibold text-white transition-colors duration-150 hover:bg-brand-600"
-            >
-              {t.nav.requestQuote}
-            </Link>
-            <WhatsAppCta />
-          </div>
+          <Reveal className="flex flex-col items-center gap-5">
+            <p className="text-lg font-semibold text-ink-900">{t.home.assistanceTitle}</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <Link
+                to="/request-quote"
+                className="inline-flex h-12 items-center justify-center rounded bg-brand-500 px-7 text-sm font-semibold text-white transition-colors duration-150 hover:bg-brand-600"
+              >
+                {t.nav.requestQuote}
+              </Link>
+              <WhatsAppCta />
+            </div>
+          </Reveal>
         </Container>
       </div>
     </div>

@@ -1,10 +1,16 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "secondary" | "outline" | "ghost";
 type Size = "sm" | "md" | "lg";
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type NativeButtonProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "onDrag" | "onDragStart" | "onDragEnd" | "onAnimationStart" | "onAnimationEnd"
+>;
+
+interface ButtonProps extends NativeButtonProps {
   variant?: Variant;
   size?: Size;
 }
@@ -24,10 +30,14 @@ const sizeClasses: Record<Size, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "primary", size = "md", type = "button", ...props }, ref) => (
-    <button
+  ({ className, variant = "primary", size = "md", type = "button", disabled, ...props }, ref) => (
+    <motion.button
       ref={ref}
       type={type}
+      disabled={disabled}
+      whileHover={disabled ? undefined : { scale: 1.02 }}
+      whileTap={disabled ? undefined : { scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={cn(
         "inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded font-medium tracking-tight transition-colors duration-150 ease-swift disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
         variantClasses[variant],

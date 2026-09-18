@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 import { useEquipmentBySlug } from "@/hooks/useEquipmentList";
 import { displayOrDash, equipmentTitle, formatPrice } from "@/lib/display";
 import { WhatsAppCta } from "@/components/site/WhatsAppCta";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
+import { Reveal } from "@/components/motion/Reveal";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
@@ -66,14 +68,21 @@ export default function EquipmentDetail() {
       </Link>
 
       <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:gap-14">
-        <div>
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-lg bg-ink-50">
+        <Reveal>
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-ink-50">
             {gallery.length > 0 ? (
-              <img
-                src={gallery[activeImage]}
-                alt={equipmentTitle(equipment)}
-                className="h-full w-full object-cover"
-              />
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={gallery[activeImage]}
+                  src={gallery[activeImage]}
+                  alt={equipmentTitle(equipment)}
+                  initial={{ opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </AnimatePresence>
             ) : (
               <div className="flex h-full w-full items-center justify-center font-medium text-ink-300">
                 {equipmentTitle(equipment)}
@@ -98,9 +107,9 @@ export default function EquipmentDetail() {
               ))}
             </div>
           )}
-        </div>
+        </Reveal>
 
-        <div>
+        <Reveal delay={0.1}>
           <span className="text-xs font-semibold uppercase tracking-widest2 text-brand-500">
             {equipment.category}
           </span>
@@ -162,7 +171,7 @@ export default function EquipmentDetail() {
               <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-600">{description}</p>
             </div>
           )}
-        </div>
+        </Reveal>
       </div>
     </Container>
   );

@@ -6,6 +6,7 @@ const links = [
   { to: "/admin", label: "Dashboard", end: true },
   { to: "/admin/inventory", label: "Inventory", end: false },
   { to: "/admin/leads", label: "Leads", end: true },
+  { to: "/admin/settings", label: "Settings", end: true },
 ];
 
 export function AdminLayout() {

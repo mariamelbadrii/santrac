@@ -45,21 +45,23 @@ export default {
           "system-ui",
           "sans-serif",
         ],
-        display: [
-          "IBM Plex Sans",
-          "IBM Plex Sans Arabic",
-          "system-ui",
-          "sans-serif",
-        ],
+        // Bold bilingual display face — Almarai natively covers Arabic
+        // and Latin at the same weights, so hero statements feel equally
+        // premium in both languages instead of Arabic getting a fallback.
+        display: ["Almarai", "IBM Plex Sans Arabic", "system-ui", "sans-serif"],
         arabic: ["IBM Plex Sans Arabic", "IBM Plex Sans", "sans-serif"],
       },
       fontSize: {
-        "display-lg": ["clamp(2.75rem, 5vw, 4.5rem)", { lineHeight: "1.04", letterSpacing: "-0.02em" }],
+        "display-xl": ["clamp(3.25rem, 7vw, 6.5rem)", { lineHeight: "0.98", letterSpacing: "-0.02em" }],
+        "display-lg": ["clamp(2.75rem, 5.5vw, 5rem)", { lineHeight: "1.02", letterSpacing: "-0.02em" }],
         "display-md": ["clamp(2.25rem, 3.6vw, 3.25rem)", { lineHeight: "1.08", letterSpacing: "-0.015em" }],
         "display-sm": ["clamp(1.75rem, 2.6vw, 2.25rem)", { lineHeight: "1.15", letterSpacing: "-0.01em" }],
       },
       letterSpacing: {
         widest2: "0.16em",
+      },
+      spacing: {
+        13: "3.25rem",
       },
       borderRadius: {
         none: "0",
@@ -78,9 +80,14 @@ export default {
         card: "0 1px 2px 0 rgb(23 19 16 / 0.04), 0 1px 6px -2px rgb(23 19 16 / 0.06)",
         "card-hover": "0 4px 16px -4px rgb(23 19 16 / 0.12)",
         panel: "0 8px 40px -12px rgb(23 19 16 / 0.18)",
+        glow: "0 0 120px 20px rgb(200 16 46 / 0.25)",
       },
       transitionTimingFunction: {
         swift: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      },
+      backgroundImage: {
+        "grid-fade":
+          "linear-gradient(to bottom, transparent, rgb(12 10 8 / 1) 65%), linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px), linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px)",
       },
     },
   },

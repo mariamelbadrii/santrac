@@ -2,11 +2,13 @@ import { MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/config";
 import { trackEvent } from "@/lib/analytics";
 import { useI18n } from "@/lib/i18n";
+import { useSiteSettings } from "@/lib/settings/SiteSettingsContext";
 import { cn } from "@/lib/utils";
 
 export function WhatsAppCta({ message, className }: { message?: string; className?: string }) {
   const { t } = useI18n();
-  const href = whatsappLink(message);
+  const { whatsappNumber } = useSiteSettings();
+  const href = whatsappLink(message, whatsappNumber);
   if (!href) return null;
 
   return (

@@ -74,6 +74,18 @@ export interface UserRoleRow {
   created_at: string;
 }
 
+// Singleton row (id always 1) holding admin-editable contact/social links.
+export interface SiteSettingsRow {
+  id: number;
+  whatsapp_number: string | null;
+  phone: string | null;
+  email: string | null;
+  facebook_url: string | null;
+  instagram_url: string | null;
+  linkedin_url: string | null;
+  updated_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -104,6 +116,12 @@ export interface Database {
         Row: UserRoleRow;
         Insert: Omit<UserRoleRow, "id" | "created_at"> & { id?: string };
         Update: Partial<UserRoleRow>;
+        Relationships: [];
+      };
+      site_settings: {
+        Row: SiteSettingsRow;
+        Insert: Omit<SiteSettingsRow, "updated_at"> & { updated_at?: string };
+        Update: Partial<SiteSettingsRow>;
         Relationships: [];
       };
     };

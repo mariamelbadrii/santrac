@@ -1,6 +1,6 @@
-import { Outlet } from "react-router-dom";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { PageTransition } from "@/components/motion/PageTransition";
 
 export function SiteLayout() {
   return (
@@ -13,7 +13,7 @@ export function SiteLayout() {
       </a>
       <Header />
       <main id="main-content" className="flex-1">
-        <Outlet />
+        <PageTransition />
       </main>
       <Footer />
     </div>
