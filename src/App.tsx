@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MotionConfig } from "framer-motion";
 import { I18nProvider } from "@/lib/i18n";
@@ -6,7 +6,7 @@ import { AdminAuthProvider } from "@/lib/auth/AdminAuthContext";
 import { SiteSettingsProvider } from "@/lib/settings/SiteSettingsContext";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { initGoogleAnalytics } from "@/lib/ga";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Equipment = lazy(() => import("@/pages/Equipment"));
@@ -28,13 +28,16 @@ const AdminSettings = lazy(() => import("@/pages/admin/AdminSettings"));
 const AdminCategories = lazy(() => import("@/pages/admin/AdminCategories"));
 
 export default function App() {
+  useEffect(() => {
+    initGoogleAnalytics();
+  }, []);
+
   return (
     <MotionConfig reducedMotion="user">
       <I18nProvider>
         <SiteSettingsProvider>
           <AdminAuthProvider>
             <BrowserRouter>
-              <GoogleAnalytics />
               <Suspense fallback={null}>
                 <Routes>
                   <Route element={<SiteLayout />}>
