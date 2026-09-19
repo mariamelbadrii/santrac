@@ -29,7 +29,7 @@ export const config = {
     youtubeUrl: import.meta.env.VITE_YOUTUBE_URL ?? "",
   },
   analytics: {
-    ga4MeasurementId: import.meta.env.VITE_GA4_MEASUREMENT_ID ?? "",
+    gaMeasurementId: import.meta.env.VITE_GA_MEASUREMENT_ID ?? "",
     metaPixelId: import.meta.env.VITE_META_PIXEL_ID ?? "",
     googleAdsConversionId: import.meta.env.VITE_GOOGLE_ADS_CONVERSION_ID ?? "",
   },

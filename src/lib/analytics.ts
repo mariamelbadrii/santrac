@@ -26,7 +26,7 @@ export function trackEvent(event: AnalyticsEvent, params?: EventParams): void {
 
   if (typeof window === "undefined") return;
 
-  if (config.analytics.ga4MeasurementId && typeof window.gtag === "function") {
+  if (config.analytics.gaMeasurementId && typeof window.gtag === "function") {
     window.gtag("event", event, params);
   }
 
@@ -89,6 +89,7 @@ export function captureUTM(): UtmParams {
 
 declare global {
   interface Window {
+    dataLayer?: unknown[][];
     gtag?: (...args: unknown[]) => void;
     fbq?: (...args: unknown[]) => void;
   }

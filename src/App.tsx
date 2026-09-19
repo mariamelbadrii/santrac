@@ -6,6 +6,7 @@ import { AdminAuthProvider } from "@/lib/auth/AdminAuthContext";
 import { SiteSettingsProvider } from "@/lib/settings/SiteSettingsContext";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 
 const Home = lazy(() => import("@/pages/Home"));
 const Equipment = lazy(() => import("@/pages/Equipment"));
@@ -33,6 +34,7 @@ export default function App() {
         <SiteSettingsProvider>
           <AdminAuthProvider>
             <BrowserRouter>
+              <GoogleAnalytics />
               <Suspense fallback={null}>
                 <Routes>
                   <Route element={<SiteLayout />}>
